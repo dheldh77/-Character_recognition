@@ -11,13 +11,12 @@ class ScoreList(models.Model):
     age = models.IntegerField()
     pub_date = models.DateTimeField('date published')
 
+
     def __str__(self):
         return self.title
 
 class Photo(models.Model):
     scorelist = models.ForeignKey(ScoreList, on_delete=models.CASCADE, null=True)
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)
-
-class editPhoto(models.Model):
-    scorelist = models.ForeignKey(ScoreList, on_delete=models.CASCADE, null=True)
-    image = models.ImageField(upload_to='uploads/', blank=True, null=True)
+    check = models.IntegerField(blank=True)
+    grade = models.BooleanField(blank=True)

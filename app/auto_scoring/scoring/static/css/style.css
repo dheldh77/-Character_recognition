@@ -127,3 +127,17 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.none{
+    display: none;
+}
+
+#submit_id{
+    display: none;
+}
+
+.view_score{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
