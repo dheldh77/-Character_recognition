@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<section class="patient-list">
+    <div class="con">
+        <table class="highlight">
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>환자이름</th>
+                    <th>담당자</th>
+                </tr>
+            </thead>
+        
+            <tbody>
+                {% for list in lists %}
+                <tr>
+                    <td style="font-size: 8px;">{{ list.pub_date }}</td>
+                    <td style="width: 60%"><a href="{% url 'result' list.id%}">{{ list.title }} 님</a></td>
+                    <td>{{ list.user.username }}</td>    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock content %}

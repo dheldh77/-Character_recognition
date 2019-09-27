@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section class="account">
+        <div class="account-form z-depth-1">
+            <div class="row">
+                <form class="col s12" action="{% url 'signup'%}" method="POST">
+                    {% csrf_token %} 
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input name="username" placeholder="Placeholder" id="first_name" type="text" class="validate">
+                            <label for="first_name">Username</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input name="password" id="last_name" type="text" class="validate">
+                            <label for="last_name">Password</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input name="confirm" id="confirm" type="text" class="validate">
+                            <label for="confirm">Confirm</label>
+                        </div>
+                    </div>
+                    <input class="waves-effect waves-light btn green darken-2" type="submit" value="signup">
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

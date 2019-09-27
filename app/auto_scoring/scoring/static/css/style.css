@@ -1,0 +1,129 @@
+.head-image{
+    background: url(../img/background.jpg);
+    background-position: center;
+    background-size: cover;
+    width: 100%;
+    height: 450px;
+}
+
+.introduction{
+    padding-top: 100px;
+    padding-bottom: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+}
+
+.introduction .intro-con{
+    width: 1000px;
+}
+
+.introduction .intro-con .title{
+    margin-bottom: 60px;
+}
+
+.introduction .intro-con .title h2{
+    color:#388e3c;
+    font-size: 36px;
+}
+
+.introduction .intro-con .content{
+    display: flex;
+    justify-content: center;
+}
+
+.introduction .intro-con .content p{
+    font-size: 18px;
+    color: #888;
+}
+
+.tech{
+    padding-top: 100px;
+    padding-bottom: 100px;
+    width: 100%;
+}
+
+.tech .tech-con .tech-title{
+    max-width: 1000px;
+    margin: auto;
+    margin-bottom: 60px;
+}
+
+.tech .tech-con .tech-title h2{
+    color: #388e3c;
+    font-size: 36px;
+}
+
+.tech .tech-con .tech-content{
+    max-width: 1000px;
+    margin: auto;
+    display: flex;
+}
+
+.tech .tech-con .tech-content .tech-card{
+    padding:30px 30px;
+    flex: 1;
+    text-align: center;
+}
+
+.tech .tech-con .tech-content .tech-card i{
+    margin-bottom: 20px;
+    font-size: 62px;
+}
+
+.tech .tech-con .tech-content .tech-card .title h3{
+    font-size: 32px;
+}
+
+.tech .tech-con .tech-content .tech-card .content p{
+    color: #888;
+}
+
+.patient-list{
+    padding-top: 100px;
+    padding-bottom: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.patient-list .con{
+    width: 1000px;
+}
+
+.scoring{
+    padding-top: 100px;
+    padding-bottom: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.scoring .con{
+    width: 500px;
+}
+
+.scoring .con .submit{
+    margin-top:50px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.result{
+    padding-top: 100px;
+    padding-bottom: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.result .con{
+    width: 500px;
+}
+
+.result .con .submit{
+    margin-top:50px;
+    display: flex;
+    justify-content: flex-end;
+}

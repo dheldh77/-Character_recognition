@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="scoring">
+    <div class="con">
+        <form enctype='multipart/form-data' method="POST">
+            {% csrf_token %}
+            <table>
+                {{form}}
+            </table>
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>File</span>
+                    <input type="file" name="file" multiple>
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+            <div class="submit">
+                <input type="submit" class="btn btn-dark" value="submit">
+            </div>
+        </form>
+    </div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>클루피</title>
+    
+    <!-- Compiled jquery cdn-->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <!-- complied materialize -->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+            
+    <!-- Compiled customized static file-->
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="{% static 'css/account.css'%}">
+    <script src="{% static 'js/script.js'%}"></script>
+    <script src="https://kit.fontawesome.com/61ec0a2175.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="navbar-fixed">
+        <nav class="green darken-2">
+            <div style="max-width: 1000px; margin:auto;" class="nav-wrapper">
+            <a href="{% url 'home' %}" class="brand-logo">클루피</a>
+            <ul class="right hide-on-med-and-down">
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'list' %}">{{user.username}}</a></li>
+                <li><a href="{% url 'scoring' %}">채점하기</a></li>
+                <li><a href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
+                    <form id="logout" method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %} <input type="hidden" />
+                    </form>
+                </li>
+                {% else %}
+                <li><a href="{% url 'login' %}">로그인</a></li>
+                <li><a href="{% url 'signup' %}">회원가입</a></li>
+                {% endif %}
+            </ul>
+            </div>
+        </nav>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
