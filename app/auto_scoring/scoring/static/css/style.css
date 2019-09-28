@@ -141,3 +141,35 @@
     justify-content: center;
     align-items: center;
 }
+
+.scoring{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scoring .con{
+    border: 1px solid #eee;
+    padding: 50px 50px;
+}
+
+.scoring .con .none .title{
+    background-color: #26a69a;
+}
+
+.scoring .con .none .title h3{
+    margin: 0;
+    padding: 10px;
+    color:white;
+    font-size: 24px;
+}
+
+.scoring .con .none .preview_patient_image{
+    height: 400px;
+    border: 1px solid #eee;
+}
+
+.scoring .con .none .preview_patient_image img{
+    max-width: 398px;
+}
