@@ -3,7 +3,7 @@ from .models import ScoreList, Photo
 from .forms import ScoreListForm
 from django.utils import timezone
 from .imageResizing import image_resizing
-from .analysis import get_age, get_gender
+from .analysis import get_age, get_gender, get_disease
 import os
 from django.conf import settings
 
@@ -81,6 +81,8 @@ def analysis(request):
     gender_total = {'male':0, 'female':0} # 전체
     gender_patient = {'male':0, 'female':0} # 환자
     gender_rate = {'male':0.0, 'female':0.0} # 비율
+    # past_diagnostic_record [stroke, high_blood_pressure, heart_disease, diabetes, cancer, none]
+    disease_patient = {'stroke':0, 'high_blood_pressure':0, 'heart_disease':0, 'diabetes':0, 'cancer':0, 'none':0}
 
     for subject in lists:
         # 전수 조사
@@ -88,10 +90,12 @@ def analysis(request):
         age_total[get_age(subject.age)] += 1
         gender_total[get_gender(subject.gender)] +=1
 
+        # 치매 진단 환자일 경우
         if(subject.pass_or_fail == False):
             patient += 1
             age_patient[get_age(subject.age)] += 1
             gender_patient[get_gender(subject.gender)] +=1
+            disease_patient[get_disease(subject.past_diagnostic_record)] += 1
     
     for key in age_total:
         if age_total[key] == 0.0:
@@ -104,8 +108,8 @@ def analysis(request):
             gender_rate[key] = 0.0
             continue
         gender_rate[key] = gender_patient[key] / gender_total[key]
+    
+    print_patient = [patient]
+    print(print_patient)
 
-    print(age_rate)
-    print(gender_rate)
-
-    return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate})
+    return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})

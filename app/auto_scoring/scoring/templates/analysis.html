@@ -9,9 +9,15 @@
     {% for key, value in gender_rate.items %}
         <input id="{{key}}" type="hidden" value="{{value}}">
     {% endfor %}
-
+    {% for key, value in disease_patient.items %}
+        <input id="{{key}}" type="hidden" value="{{value}}">
+    {% endfor %}
+    {% for patient in patients %}
+        <input id="patient" type="hidden" value="{{patient}}">
+    {% endfor%}
     <div class="con">
         <!-- Gender-Dementia chart -->
+        
         <div class="chart_menu">
             <div class="title">
                 <h2><i class="material-icons">insert_chart</i>Gender-Dementia chart</h2>
@@ -31,6 +37,16 @@
             </div>
             <canvas id="age_chart" width="400" height="400"></canvas>
         </div>
+        <!-- Disease-Dementia chart -->
+        <div class="chart_menu">
+            <div class="title">
+                <h2><i class="material-icons">pie_chart</i>Age-Grade chart</h2>
+            </div>
+            <div class="sub_title">
+                <p>correlation chart about age rate and grade</p>
+            </div>
+            <canvas id="disease_chart" width="400" height="400"></canvas>
+        </div>
         <!-- Question-Correct rate chart -->
         <div class="chart_menu">
             <div class="title">
@@ -45,7 +61,6 @@
 </section>
 
 <!-- gender_chart -->
-
 <script>
     var ctx = document.getElementById('gender_chart');
     var gender_arr = new Array();
@@ -120,6 +135,59 @@
                     'rgba(255, 159, 64, 0.2)'
                 ],
                 pointBorderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- Disease-Dementia chart -->
+<script>
+    var ctx = document.getElementById('disease_chart');
+    // 배열 선언
+    var disease_arr = new Array();
+    // html에서 값 불러옴
+    patient = $('#patient').val();
+    stroke = Number($('#stroke').val()) / Number(patient);
+    heart_disease = Number($('#heart_disease').val()) / Number(patient);
+    high_blood_pressure = Number($('#high_blood_pressure ').val()) / Number(patient);
+    diabetes= Number($('#diabetes').val()) / Number(patient);
+    cancer = Number($('#cancer').val()) / Number(patient);
+    none = Number($('#none').val()) / Number(patient);
+
+    disease_arr = [stroke, heart_disease, high_blood_pressure, diabetes, cancer, none];
+    
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['뇌졸증', '심장병', '고혈압', '당뇨병', '기타(암포함)', '없음'],
+            datasets: [{
+                label: '# 환자 비율',
+                data: disease_arr,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
                     'rgba(255, 99, 132, 1)',
                     'rgba(54, 162, 235, 1)',
                     'rgba(255, 206, 86, 1)',
