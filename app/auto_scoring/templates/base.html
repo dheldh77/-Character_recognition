@@ -16,6 +16,9 @@
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Compiled chart.js-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
             
     <!-- Compiled customized static file-->
     <link rel="stylesheet" href="{% static 'css/style.css'%}">
@@ -32,12 +35,14 @@
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'list' %}">{{user.username}}</a></li>
                 <li><a href="{% url 'scoring' %}">채점하기</a></li>
+                <li><a href="{% url 'analysis' %}">데이터</a></li>
                 <li><a href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
                     <form id="logout" method="POST" action="{% url 'logout' %}">
                         {% csrf_token %} <input type="hidden" />
                     </form>
                 </li>
                 {% else %}
+                <li><a href="{% url 'analysis' %}">데이터</a></li>
                 <li><a href="{% url 'login' %}">로그인</a></li>
                 <li><a href="{% url 'signup' %}">회원가입</a></li>
                 {% endif %}

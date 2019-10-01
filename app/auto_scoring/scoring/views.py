@@ -50,8 +50,47 @@ def scoring(request):
             dic[i] = check_name
         return render(request, 'scoring.html', {'form':form, 'dic':dic})
 
-
-
 def result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'result.html', {'list' : list})
+
+def analysis(request):
+    lists = ScoreList.objects.all()
+    age = {'30':0, '40':0, '50':0, '60':0, '70':0, '80':0}
+    gender = {'남':0, '여':0}
+
+    for patient in lists:
+        patient_age = patient.age
+        patient_gender = patient.gender
+
+        if patient_gender == '남':
+            gender_number = gender['남']
+            gender['남'] = gender_number + 1
+            
+        else:
+            gender_number = gender['여']
+            gender['여'] = gender_number + 1
+            
+
+        if patient_age < 40:
+            total = age['30']
+            age['30'] = total + 1
+        elif (patient_age >= 40) and (patient_age < 50):
+            total = age['40']
+            age['40'] = total + 1
+        elif (patient_age >= 50) and (patient_age < 60):
+            total = age['50']
+            age['50'] = total + 1
+        elif (patient_age >= 60) and (patient_age < 70):
+            total = age['60']
+            age['60'] = total + 1
+        elif (patient_age >= 70) and (patient_age < 80):
+            total = age['70']
+            age['70'] = total + 1
+        else :
+            total = age['80']
+            age['80'] = total + 1
+        
+    print(age)
+    print(gender)
+    return render(request, 'analysis.html', {'age':age, 'gender':gender})

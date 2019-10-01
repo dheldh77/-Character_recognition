@@ -25,6 +25,7 @@ urlpatterns = [
     path('', scoring.views.home, name='home'),
     path('list/', scoring.views.list, name='list'),
     path('scoring/scoring', scoring.views.scoring, name='scoring'),
+    path('scoring/analysis', scoring.views.analysis, name='analysis'),
     path('scoring/result/<int:list_id>', scoring.views.result, name='result'),
     path('account/login', account.views.login, name='login'),
     path('account/signup', account.views.signup, name='signup'),

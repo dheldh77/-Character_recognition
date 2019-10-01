@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<section class="chart">
+    <div class="con">
+        <div class="chart_menu">
+            <div class="title">
+                <h2><i class="material-icons">insert_chart</i>Age-Grade chart</h2>
+            </div>
+            <div class="sub_title">
+                <p>enter the subtitle about this graph</p>
+            </div>
+            <canvas id="age_chart" width="400" height="400"></canvas>
+        </div>
+        <div class="chart_menu">
+            <div class="title">
+                <h2><i class="material-icons">pie_chart</i>Gender-Dementia chart</h2>
+            </div>
+            <div class="sub_title">
+                <p>enter the subtitle about this graph</p>
+            </div>
+            <canvas id="gender_chart" width="400" height="400"></canvas>
+        </div>
+        <div class="chart_menu">
+            <div class="title">
+                <h2><i class="material-icons">insert_chart</i>Question-Correct rate chart</h2>
+            </div>
+            <div class="sub_title">
+                <p>enter the subtitle about this graph</p>
+            </div>
+            <canvas id="number_pass_chart" width="400" height="400"></canvas>
+        </div>
+    </div>
+</section>
+
+<!-- gender_chart -->
+<script>
+    var ctx = document.getElementById('gender_chart');
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['male', 'female',],
+            datasets: [{
+                label: '',
+                data: [12, 19],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+<!-- number pass chart -->
+<script>
+    var ctx = document.getElementById('number_pass_chart');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['1번', '2번', '3번', '4번', '5번', '6번', '7번', '8번', '9번', '10번'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3, 4, 5, 6, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+<!-- age chart -->
+<script>
+    var ctx = document.getElementById('age_chart');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['30대 이하', '40대', '50대', '60대', '70대', '80대 이상'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+{% endblock content %}
