@@ -5,28 +5,84 @@
         <table class="striped centered">
             <tbody>
                 <tr>
-                    <td>이름</td>
-                    <td>{{list.title}}</td>
+                    <td>성명</td>
+                    <td>{{list.name}}</td>
                 </tr>
                 <tr>
                     <td>성별</td>
-                    <td>{{list.gender}}</td>
+                    <td>
+                        {% if list.gender == 1 %}
+                            남성
+                        {% else %}
+                            여성
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
-                    <td>나이</td>
-                    <td>{{list.age}}</td>
+                    <td>연령</td>
+                    <td>{{list.age}} 세</td>
                 </tr>
                 <tr>
-                    <td>담당자</td>
-                    <td>{{list.user.username}}</td>
+                    <td>혈액형</td>
+                    <td>
+                        {% if list.blood_type == 1 %}
+                            A 형
+                        {% elif list.blood_type == 2 %}
+                            B 형
+                        {% elif list.blood_type == 3 %}
+                            O 형
+                        {% else %}
+                            AB 형
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
-                    <td>날짜</td>
+                    <td>신장</td>
+                    <td>{{list.height}} cm</td>
+                </tr>
+                <tr>
+                    <td>몸무게</td>
+                    <td>{{list.weight}} kg</td>
+                </tr>
+                <tr>
+                    <td>과거력</td>
+                    <td>
+                        {% if list.past_diagnostic_record == 1 %}
+                            뇌졸증
+                        {% elif list.past_diagnostic_record == 2 %}
+                            심장병
+                        {% elif list.past_diagnostic_record == 3 %}
+                            고혈압
+                        {% elif list.past_diagnostic_record == 4 %}
+                            당뇨병
+                        {% elif list.past_diagnostic_record == 5 %}
+                            기타(암포함)
+                        {% else %}
+                            없음
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>진단일</td>
                     <td>{{list.pub_date}}</td>
                 </tr>
                 <tr>
                     <td>정답률</td>
-                    <td>90%</td>
+                    <td>{{list.score}} %</td>
+                </tr>
+                <tr>
+                    <td>치매 진단 여부</td>
+                    <td>
+                        {% if list.pass_or_fail == True %}
+                            <span style="color:#1e88e5;">O</span>
+                        {% else %}
+                            <span style="color:#ff1744;">X</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>담당의</td>
+                    <td>{{list.user.username}}</td>
                 </tr>
             </tbody>
         </table>

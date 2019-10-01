@@ -3,6 +3,7 @@ from .models import ScoreList, Photo
 from .forms import ScoreListForm
 from django.utils import timezone
 from .imageResizing import image_resizing
+from .analysis import get_age, get_gender
 import os
 from django.conf import settings
 
@@ -22,15 +23,29 @@ def scoring(request):
             #모델 객체를 db에 저장하지 않은 상태로 반환
             list = form.save(commit=False)
             list.user = request.user
-            list.pub_date = timezone.now()
+            list.name = request.POST['name']
+            list.gender = int(request.POST['gender'])
+            list.age = request.POST['age']
+            list.blood_type = int(request.POST['blood_type'])
+            list.height = request.POST['height']
+            list.weight = request.POST['weight']
+            list.past_diagnostic_record = int(request.POST['past_diagnostic_record'])
+            list.pub_date = request.POST['pub_date']
+            list.score = 30
+            if list.score >= 70:
+                list.pass_or_fail = True
+            else:
+                list.pass_or_fail = False
             list.save()
+
+            # 이미지 저장
             for i in range(1, 5):
                 img = Photo()
                 img.scorelist = list
-                name = 'file' + str(i)
-                check = 'check' + str(i)
-                img.image = request.FILES[name]
-                img.check = request.POST[check]
+                file_name = 'file' + str(i)
+                check_name = 'check' + str(i)
+                img.image = request.FILES[file_name]
+                img.check = request.POST[check_name]
                 img.grade = True
                 img.save()
             # for afile in request.FILES.getlist('file'):
@@ -48,7 +63,7 @@ def scoring(request):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
-        return render(request, 'scoring.html', {'form':form, 'dic':dic})
+        return render(request, 'scoring.html', {'dic':dic})
 
 def result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
@@ -56,41 +71,41 @@ def result(request, list_id):
 
 def analysis(request):
     lists = ScoreList.objects.all()
-    age = {'30':0, '40':0, '50':0, '60':0, '70':0, '80':0}
-    gender = {'남':0, '여':0}
+    total = 0
+    patient = 0
+    # age [30대 이하, 40대, 50대, 60대, 70대, 80대 이상]
+    age_total = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 전체
+    age_patient = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 환자
+    age_rate = { 30:0.0, 40:0.0, 50:0.0, 60:0.0, 70:0, 80:0.0} # 비율
+    # gender ['남', '여']
+    gender_total = {'male':0, 'female':0} # 전체
+    gender_patient = {'male':0, 'female':0} # 환자
+    gender_rate = {'male':0.0, 'female':0.0} # 비율
 
-    for patient in lists:
-        patient_age = patient.age
-        patient_gender = patient.gender
+    for subject in lists:
+        # 전수 조사
+        total += 1
+        age_total[get_age(subject.age)] += 1
+        gender_total[get_gender(subject.gender)] +=1
 
-        if patient_gender == '남':
-            gender_number = gender['남']
-            gender['남'] = gender_number + 1
-            
-        else:
-            gender_number = gender['여']
-            gender['여'] = gender_number + 1
-            
+        if(subject.pass_or_fail == False):
+            patient += 1
+            age_patient[get_age(subject.age)] += 1
+            gender_patient[get_gender(subject.gender)] +=1
+    
+    for key in age_total:
+        if age_total[key] == 0.0:
+            age_rate[key] = 0.0
+            continue
+        age_rate[key] = age_patient[key] / age_total[key]
 
-        if patient_age < 40:
-            total = age['30']
-            age['30'] = total + 1
-        elif (patient_age >= 40) and (patient_age < 50):
-            total = age['40']
-            age['40'] = total + 1
-        elif (patient_age >= 50) and (patient_age < 60):
-            total = age['50']
-            age['50'] = total + 1
-        elif (patient_age >= 60) and (patient_age < 70):
-            total = age['60']
-            age['60'] = total + 1
-        elif (patient_age >= 70) and (patient_age < 80):
-            total = age['70']
-            age['70'] = total + 1
-        else :
-            total = age['80']
-            age['80'] = total + 1
-        
-    print(age)
-    print(gender)
-    return render(request, 'analysis.html', {'age':age, 'gender':gender})
+    for key in gender_total:
+        if gender_total[key] == 0.0:
+            gender_rate[key] = 0.0
+            continue
+        gender_rate[key] = gender_patient[key] / gender_total[key]
+
+    print(age_rate)
+    print(gender_rate)
+
+    return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate})

@@ -2,31 +2,42 @@
 {% block content %}
 {% load static %}
 <section class="chart">
+    <!-- 환자에 대한 정보가 저장되어있는 딕셔너리 전부 불러옴 -->
+    {% for key, value in age_rate.items %}
+        <input id="{{key}}" type="hidden" value="{{value}}">
+    {% endfor %}
+    {% for key, value in gender_rate.items %}
+        <input id="{{key}}" type="hidden" value="{{value}}">
+    {% endfor %}
+
     <div class="con">
+        <!-- Gender-Dementia chart -->
         <div class="chart_menu">
             <div class="title">
-                <h2><i class="material-icons">insert_chart</i>Age-Grade chart</h2>
+                <h2><i class="material-icons">insert_chart</i>Gender-Dementia chart</h2>
             </div>
             <div class="sub_title">
-                <p>enter the subtitle about this graph</p>
-            </div>
-            <canvas id="age_chart" width="400" height="400"></canvas>
-        </div>
-        <div class="chart_menu">
-            <div class="title">
-                <h2><i class="material-icons">pie_chart</i>Gender-Dementia chart</h2>
-            </div>
-            <div class="sub_title">
-                <p>enter the subtitle about this graph</p>
+                <p>correlation chart about gender and demetia patient rate</p>
             </div>
             <canvas id="gender_chart" width="400" height="400"></canvas>
         </div>
+        <!-- Age-Grade chart -->
+        <div class="chart_menu">
+            <div class="title">
+                <h2><i class="material-icons">pie_chart</i>Age-Grade chart</h2>
+            </div>
+            <div class="sub_title">
+                <p>correlation chart about age rate and grade</p>
+            </div>
+            <canvas id="age_chart" width="400" height="400"></canvas>
+        </div>
+        <!-- Question-Correct rate chart -->
         <div class="chart_menu">
             <div class="title">
                 <h2><i class="material-icons">insert_chart</i>Question-Correct rate chart</h2>
             </div>
             <div class="sub_title">
-                <p>enter the subtitle about this graph</p>
+                <p>correlation chart about question and correct rate</p>
             </div>
             <canvas id="number_pass_chart" width="400" height="400"></canvas>
         </div>
@@ -34,22 +45,87 @@
 </section>
 
 <!-- gender_chart -->
+
 <script>
     var ctx = document.getElementById('gender_chart');
+    var gender_arr = new Array();
+    // 딕셔너리 넘겨받기
+    male = $('#male').val();
+    female = $('#female').val();
+    gender_arr.push(male);
+    gender_arr.push(female);
+    
     var myChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
-            labels: ['male', 'female',],
+            labels: ['male', 'female'],
             datasets: [{
-                label: '',
-                data: [12, 19],
+                label: '# 치매 진단 환자 / 검사자',
+                data: gender_arr,
                 backgroundColor: [
                     'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(255, 99, 132, 0.2)'
                 ],
                 borderColor: [
                     'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+<!-- age chart -->
+<script>
+    var ctx = document.getElementById('age_chart');
+    // 배열 선언
+    var age_arr = new Array();
+    // 딕셔너리 넘겨받는 반복문
+    for(var i = 30; i < 90; i += 10){
+        temp = '#' + String(i);
+        age = $(temp).val();
+        age = age.substr(0,4);
+        age_arr.push(Number(age));
+    }
+    
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['30대 이하', '40대', '50대', '60대', '70대', '80대 이상'],
+            datasets: [{
+                label: '# 환자 비율',
+                data: age_arr,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)'
+                ],
+                pointBackgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                pointBorderColor: [
                     'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
                 ],
                 borderWidth: 1
             }]
@@ -106,44 +182,5 @@
         }
     });
 </script>
-<!-- age chart -->
-<script>
-    var ctx = document.getElementById('age_chart');
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['30대 이하', '40대', '50대', '60대', '70대', '80대 이상'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-</script>
+
 {% endblock content %}

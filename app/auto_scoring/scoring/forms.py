@@ -5,4 +5,4 @@ from .models import ScoreList
 class ScoreListForm(forms.ModelForm):
     class Meta:
         model = ScoreList
-        fields = ['title','gender','age']
+        fields = []

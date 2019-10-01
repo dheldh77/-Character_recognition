@@ -6,9 +6,65 @@
             {% csrf_token %}
             <!-- 개인 정보 입력 -->
             <div id="default">
-                <table>
-                    {{form}}
-                </table>
+                <!-- 성명, 성별 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input name="name" placeholder="O O O" id="name" type="text" class="validate">
+                        <label for="name">이름</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="gender">
+                            <option value="" disabled selected>성별</option>
+                            <option value="1">남</option>
+                            <option value="2">여</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- 연령, 혈액형 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input name="age" id="age" type="number" class="validate">
+                        <label for="age">나이</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="blood_type">
+                            <option value="" disabled selected>혈액형</option>
+                            <option value="1">A</option>
+                            <option value="2">B</option>
+                            <option value="3">O</option>
+                            <option value="4">AB</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- 신장, 몸무게 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input id="height" name="height" type="number" class="validate">
+                        <label for="height">신장</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="weight" name="weight" type="number" class="validate">
+                        <label for="weight">몸무게</label>
+                    </div>
+                </div>
+                <!-- 과거력, 진단일 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select name="past_diagnostic_record">
+                            <option value="" disabled selected>과거력</option>
+                            <option value="1">뇌졸증</option>
+                            <option value="2">심장병</option>
+                            <option value="3">고혈압</option>
+                            <option value="4">당뇨병</option>
+                            <option value="5">기타(암포함)</option>
+                            <option value="6">없음</option>
+                        </select>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="pub_date" name="pub_date" type="date" class="validate">
+                        <label for="pub_date">진단일</label>
+                    </div>
+                </div>
                 <div class="submit">
                     <a onclick="cust('0')" class="waves-effect waves-light btn">Next</a>
                 </div>
@@ -86,6 +142,13 @@
     $("form#mainform input[type='file']").change(function(){
         readURL(this);
         });
+</script>
+
+<script>
+    // select tag
+    $(document).ready(function(){
+        $('select').formSelect();
+    });
 </script>
 
 
