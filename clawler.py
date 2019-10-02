@@ -100,9 +100,6 @@ jsonfile = open('seeddata.json', 'w')
 
 fieldnames = ("user", "name", "gender", "age", "blood_type", "height", "weight", "past_diagnostic_record", "pub_date", "score", "pass_or_fail")
 reader = csv.DictReader( csvfile, fieldnames)
-jsonfile.write('[')
 for row in reader:
-    jsonfile.write('{"model": "scoring.scorelist","fields": ')
     json.dump(row, jsonfile, ensure_ascii = False)
-    jsonfile.write('},\n')
-jsonfile.write('{"model": "scoring.scorelist","fields": {"user": "1", "name": "김민석", "gender": "1", "age": "26", "blood_type": "4", "height": "164.6380182880382", "weight": "54.28083307579061", "past_diagnostic_record": "6", "pub_date": "2019-06-04T15:43:28", "score": "66", "pass_or_fail": "False"}}]')
+    jsonfile.write(',\n')

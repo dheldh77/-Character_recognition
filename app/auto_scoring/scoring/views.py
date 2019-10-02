@@ -6,16 +6,28 @@ from .imageResizing import image_resizing
 from .analysis import get_age, get_gender, get_disease
 import os
 from django.conf import settings
+from django.core.paginator import Paginator, PageNotAnInteger
+from .create_csv import MakeCSV
 
 
-# Create your views here.
+# 메인화면
 def home(request):
     return render(request, 'home.html')
 
+# 검사자 리스트 화면
 def list(request):
-    lists = ScoreList.objects.all()
+    subjects = ScoreList.objects.all().order_by('-id')
+    # 페이지네이션
+    paginator = Paginator(subjects, 10)
+    try:
+        page = request.GET.get('page', 1)
+    except PageNotAnInteger:
+        page = 1
+    
+    lists = paginator.get_page(page)
     return render(request, 'list.html', {'lists':lists})
 
+# 채점화면
 def scoring(request):
     if request.method == 'POST':
         form = ScoreListForm(request.POST)
@@ -65,10 +77,12 @@ def scoring(request):
             dic[i] = check_name
         return render(request, 'scoring.html', {'dic':dic})
 
+# 결과화면
 def result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'result.html', {'list' : list})
 
+# 데이터 분석 결과 화면
 def analysis(request):
     lists = ScoreList.objects.all()
     total = 0
@@ -114,8 +128,31 @@ def analysis(request):
 
     return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})
 
+# 이미지 학습
 def image_analysis(request):
     return redirect('home')
 
+# 데이터 학습
 def data_analysis(request):
+    # db에 저장된 환자 정보를 모드 긁어옴
+    subjects = ScoreList.objects.all().order_by('-id')
+    list_subjects = []
+
+    for subject in subjects:
+        subject_dic = {}
+        subject_dic["user"] = subject.user.username
+        subject_dic["name"] = subject.name
+        subject_dic["gender"] = subject.gender
+        subject_dic["age"] = subject.age
+        subject_dic["blood_type"] = subject.blood_type
+        subject_dic["height"] = subject.height
+        subject_dic["weight"] = subject.weight
+        subject_dic["past_diagnostic_record"] = subject.past_diagnostic_record
+        subject_dic["pub_date"] = subject.pub_date
+        subject_dic["score"] = subject.score
+        subject_dic["pass_or_fail"] = subject.pass_or_fail
+        list_subjects.append(subject_dic)
+    MakeCSV(list_subjects)
+    # 테이터 출력용
+    # print(MakeCSV(list_subjects))
     return redirect('analysis')

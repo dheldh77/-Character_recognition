@@ -22,6 +22,30 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div>
+            <ul class="pagination" style="display: flex; justify-content:center;">
+                {% if lists.has_previous %}
+                <li class="waves-effect"><a href="?page={{lists.previous_page_number}}"><i class="material-icons">chevron_left</i></a></li>
+                {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                {% endif %}
+                <li class="active"><a href="#!">{{lists.number}}</a></li>
+                <!-- <li class="waves-effect"><a href="#!">2</a></li>
+                <li class="waves-effect"><a href="#!">3</a></li>
+                <li class="waves-effect"><a href="#!">4</a></li>
+                <li class="waves-effect"><a href="#!">5</a></li> -->
+                <!-- <div>
+                    <span>{{lists.number}}</span>
+                    <span>of</span>
+                    <span>{{lists.paginator.num_pages}}</span>
+                </div> -->
+                {% if lists.has_next %}
+                <li class="waves-effect"><a href="?page={{lists.next_page_number}}"><i class="material-icons">chevron_right</i></a></li>
+                {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </section>
 
