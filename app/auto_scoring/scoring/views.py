@@ -113,3 +113,9 @@ def analysis(request):
     print(print_patient)
 
     return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})
+
+def image_analysis(request):
+    return redirect('home')
+
+def data_analysis(request):
+    return redirect('analysis')

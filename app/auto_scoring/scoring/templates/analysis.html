@@ -66,6 +66,10 @@
     // 딕셔너리 넘겨받기
     male = $('#male').val();
     female = $('#female').val();
+    
+    // 소수점 2자리수까지 자르기
+    male = male.substr(0,4);
+    female = female.substr(0,4);
     gender_arr.push(male);
     gender_arr.push(female);
     
@@ -91,7 +95,9 @@
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        min: 0.3,
+                        max: 1.0,
+                        stepSize: 0.1
                     }
                 }]
             }
@@ -148,7 +154,9 @@
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        min: 0.3,
+                        max: 1.0,
+                        stepSize: 0.1
                     }
                 }]
             }
