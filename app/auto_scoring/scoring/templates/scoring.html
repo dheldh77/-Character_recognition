@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load static %}
 <section class="scoring">
-    <div class="con">
+    <div class="con" id="con_change">
         <form enctype='multipart/form-data' method="POST" id="mainform">
             {% csrf_token %}
             <!-- 개인 정보 입력 -->
@@ -66,41 +67,99 @@
                     </div>
                 </div>
                 <div class="submit">
+                    <a onclick="cust('second')" class="waves-effect waves-light btn">Next</a>
+                </div>
+            </div>
+            <div class="none" id="second">
+                <!-- ASF: float, nWBV: float 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input name="ASF" id="ASF" type="number" step="0.001" class="validate">
+                        <label for="ASF">ASF</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input name="nWBV" id="nWBV" type="number" step="0.001" class="validate">
+                        <label for="nWBV">nWBV</label>
+                    </div>
+                </div>
+                <!-- eTIV: integer, hand: (1, 2) 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input name="eTIV" id="eTIV" type="number" class="validate">
+                        <label for="eTIV">eTIV</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="hand">
+                            <option value="" disabled selected>손잡이</option>
+                            <option value="1">오른손</option>
+                            <option value="2">왼손</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- MMSE: float, SES: float(1.0, 2.0 ... 5.0) 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input id="MMSE" name="MMSE" type="number" step="0.1" class="validate">
+                        <label for="MMSE">MMSE</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="SES">
+                            <option value="" disabled selected>SES</option>
+                            <option value="1.0">1.0</option>
+                            <option value="2.0">2.0</option>
+                            <option value="3.0">3.0</option>
+                            <option value="4.0">4.0</option>
+                            <option value="5.0">5.0</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- educ: integer, MR_Delay: integer 입력 -->
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input id="educ" name="educ" type="number" class="validate">
+                        <label for="educ">교육 기간</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="MR_Delay" name="MR_Delay" type="number" class="validate">
+                        <label for="MR_Delay">MR_Delay</label>
+                    </div>
+                </div>
+                <div class="submit">
                     <a onclick="cust('0')" class="waves-effect waves-light btn">Next</a>
                 </div>
             </div>
             {% for key, value in dic.items %}
-                <!-- 답안지 체출 -->
-                <div class="none" id="{{key}}">
-                    <div style="text-align: center;">
-                        <div class="title">
-                            <h3>{{key}}번 문제</h3>
-                        </div>
-                        <div class="preview_patient_image">
-                            <img src="" id="preview-{{value}}" height="400px" />
-                        </div>
+            <!-- 답안지 체출 -->
+            <div class="none" id="{{key}}">
+                <div style="text-align: center;">
+                    <div class="title">
+                        <h3>{{key}}번 문제</h3>
                     </div>
-                    
-                    <div class="file-field input-field">
-                        <div class="btn">
-                            <span>File</span>
-                            <input type="file" name="file{{key}}" id="{{value}}">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s6">
-                            <i class="material-icons prefix">assignment_turned_in</i>
-                            <input id="icon_prefix" type="number" name="{{value}}" class="validate">
-                            <label for="icon_prefix">answer</label>
-                        </div>
-                    </div>
-                    <div class="submit">
-                        <a onclick="cust('{{key}}')" class="waves-effect waves-light btn">Next</a>
+                    <div class="preview_patient_image">
+                        <img src="" id="preview-{{value}}" height="400px" />
                     </div>
                 </div>
+                
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" name="file{{key}}" id="{{value}}">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <i class="material-icons prefix">assignment_turned_in</i>
+                        <input id="icon_prefix" type="number" name="{{value}}" class="validate">
+                        <label for="icon_prefix">answer</label>
+                    </div>
+                </div>
+                <div class="submit">
+                    <a onclick="cust('{{key}}')" class="waves-effect waves-light btn">Next</a>
+                </div>
+            </div>
             {% endfor %}
             <!-- 채점 -->
             <div style="display: flex; justify-content: center;">
@@ -113,16 +172,25 @@
 </section>
 <script>
     function cust(arg){
-        if(arg == '0'){
+        if(arg == 'second'){
             $('#default').css('display','none');
+            $('#second').css('display','unset');
         }
-        if(arg == '4'){
+        else if(arg == '0'){
+            $('#second').css('display','none');
+            $('#1').css('display','unset');
+            $('#con_change').css('width', '500px');
+        }
+        else if(arg == '4'){
+            $('#4').css('display','none');
             $('#submit_id').css('display','unset');
         }
-        temp = '#' + arg;
-        next = '#' + String(Number(arg) + 1);
-        $(temp).css('display','none');
-        $(next).css('display','unset');
+        else{
+            temp = '#' + arg;
+            next = '#' + String(Number(arg) + 1);
+            $(temp).css('display','none');
+            $(next).css('display','unset');
+        }
     }
 </script>
 

@@ -26,6 +26,7 @@ urlpatterns = [
     path('list/', scoring.views.list, name='list'),
     path('scoring/scoring', scoring.views.scoring, name='scoring'),
     path('scoring/analysis', scoring.views.analysis, name='analysis'),
+    path('scoring/select', scoring.views.select, name='select'),
     path('scoring/result/<int:list_id>', scoring.views.result, name='result'),
     path('scoring/image_analysis', scoring.views.image_analysis, name='image_analysis'),
     path('scoring/data_analysis', scoring.views.data_analysis, name='data_analysis'),

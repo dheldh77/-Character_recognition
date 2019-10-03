@@ -1,91 +1,141 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load static %}
 <section class="result">
     <div class="con">
-        <table class="striped centered">
-            <tbody>
-                <tr>
-                    <td>성명</td>
-                    <td>{{list.name}}</td>
-                </tr>
-                <tr>
-                    <td>성별</td>
-                    <td>
-                        {% if list.gender == 1 %}
-                            남성
-                        {% else %}
-                            여성
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>연령</td>
-                    <td>{{list.age}} 세</td>
-                </tr>
-                <tr>
-                    <td>혈액형</td>
-                    <td>
-                        {% if list.blood_type == 1 %}
-                            A 형
-                        {% elif list.blood_type == 2 %}
-                            B 형
-                        {% elif list.blood_type == 3 %}
-                            O 형
-                        {% else %}
-                            AB 형
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>신장</td>
-                    <td>{{list.height}} cm</td>
-                </tr>
-                <tr>
-                    <td>몸무게</td>
-                    <td>{{list.weight}} kg</td>
-                </tr>
-                <tr>
-                    <td>과거력</td>
-                    <td>
-                        {% if list.past_diagnostic_record == 1 %}
-                            뇌졸증
-                        {% elif list.past_diagnostic_record == 2 %}
-                            심장병
-                        {% elif list.past_diagnostic_record == 3 %}
-                            고혈압
-                        {% elif list.past_diagnostic_record == 4 %}
-                            당뇨병
-                        {% elif list.past_diagnostic_record == 5 %}
-                            기타(암포함)
-                        {% else %}
-                            없음
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>진단일</td>
-                    <td>{{list.pub_date}}</td>
-                </tr>
-                <tr>
-                    <td>정답률</td>
-                    <td>{{list.score}} %</td>
-                </tr>
-                <tr>
-                    <td>치매 진단 여부</td>
-                    <td>
-                        {% if list.pass_or_fail == True %}
-                            <span style="color:#1e88e5;">O</span>
-                        {% else %}
-                            <span style="color:#ff1744;">X</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>담당의</td>
-                    <td>{{list.user.username}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="display: flex;">
+            <table class="striped centered">
+                <tbody>
+                    <tr>
+                        <td style="width: 140px;">성명</td>
+                        <td>{{list.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>성별</td>
+                        <td>
+                            {% if list.gender == 1 %}
+                                남성
+                            {% else %}
+                                여성
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>연령</td>
+                        <td>{{list.age}} 세</td>
+                    </tr>
+                    <tr>
+                        <td>혈액형</td>
+                        <td>
+                            {% if list.blood_type == 1 %}
+                                A 형
+                            {% elif list.blood_type == 2 %}
+                                B 형
+                            {% elif list.blood_type == 3 %}
+                                O 형
+                            {% else %}
+                                AB 형
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>신장</td>
+                        <td>{{list.height}} cm</td>
+                    </tr>
+                    <tr>
+                        <td>몸무게</td>
+                        <td>{{list.weight}} kg</td>
+                    </tr>
+                    <tr>
+                        <td>과거력</td>
+                        <td>
+                            {% if list.past_diagnostic_record == 1 %}
+                                뇌졸증
+                            {% elif list.past_diagnostic_record == 2 %}
+                                심장병
+                            {% elif list.past_diagnostic_record == 3 %}
+                                고혈압
+                            {% elif list.past_diagnostic_record == 4 %}
+                                당뇨병
+                            {% elif list.past_diagnostic_record == 5 %}
+                                기타(암포함)
+                            {% else %}
+                                없음
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>진단일</td>
+                        <td>{{list.pub_date}}</td>
+                    </tr>
+                    <tr>
+                        <td>임상 치매 진단</td>
+                        <td>{{list.CDR}}</td>
+                    </tr>
+                    <tr>
+                        <td>담당의</td>
+                        <td>{{list.user.username}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="striped centered">
+                <tbody>
+                    <tr>
+                        <td style="width: 140px;">ASF</td>
+                        <td>{{list.ASF}}</td>
+                    </tr>
+                    <tr>
+                        <td >nWBV</td>
+                        <td>{{list.nWBV}}</td>
+                    </tr>
+                    <tr>
+                        <td>eTIV</td>
+                        <td>{{list.eTIV}}</td>
+                    </tr>
+                    <tr>
+                        <td>MMSE</td>
+                        <td>{{list.MMSE}}</td>
+                    </tr>
+                    <tr>
+                        <td>SES</td>
+                        <td>{{list.SES}}</td>
+                    </tr>
+                    <tr>
+                        <td>교육 기간</td>
+                        <td>{{list.educ}} 년</td>
+                    </tr>
+                    <tr>
+                        <td>MR Delay</td>
+                        <td>{{list.MR_delay}}</td>
+                    </tr>
+                    <tr>
+                        <td>손잡이</td>
+                        <td>
+                            {% if list.pub_date == 1%}
+                                오른손
+                            {% else %}
+                                왼손
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>정답률</td>
+                        <td>{{list.score}} %</td>
+                    </tr>
+                    <tr>
+                        <td>치매 진단 여부</td>
+                        <td>
+                            {% if list.pass_or_fail == True %}
+                                <span style="color:#1e88e5;">O</span>
+                            {% else %}
+                                <span style="color:#ff1744;">X</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
         <div class="submit">
             <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>
         </div>

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<section class="select">
+    <div class="con">
+        <a class="waves-effect waves-light btn"><i class="material-icons left">chevron_left</i>only test</a>
+        <a href="{% url 'scoring' %}" class="waves-effect waves-light btn"><i class="material-icons right">chevron_right</i>record patient</a>
+    </div>
+</section>
+{% endblock content %}

@@ -38,7 +38,7 @@
                 <li><a href="{% url 'image_analysis' %}">이미지분석</a></li>
                 <li><a href="{% url 'data_analysis' %}">데이터분석</a></li>
                 {% endif %}
-                <li><a href="{% url 'scoring' %}">채점하기</a></li>
+                <li><a href="{% url 'select' %}">채점하기</a></li>
                 <li><a href="{% url 'analysis' %}">데이터</a></li>
                 <li><a href="javascript:{document.getElementById('logout').submit()}">로그아웃</a>
                     <form id="logout" method="POST" action="{% url 'logout' %}">

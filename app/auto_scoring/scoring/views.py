@@ -27,6 +27,10 @@ def list(request):
     lists = paginator.get_page(page)
     return render(request, 'list.html', {'lists':lists})
 
+# 선택화면
+def select(request):
+    return render(request, 'select.html')
+
 # 채점화면
 def scoring(request):
     if request.method == 'POST':
@@ -48,6 +52,15 @@ def scoring(request):
                 list.pass_or_fail = True
             else:
                 list.pass_or_fail = False
+            list.ASF = request.POST['ASF']
+            list.nWBV = request.POST['nWBV']
+            list.eTIV = request.POST['eTIV']
+            list.hand = int(request.POST['hand'])
+            list.MMSE = request.POST['MMSE']
+            list.SES = float(request.POST['SES'])
+            list.educ = request.POST['educ']
+            list.MR_delay = int(request.POST["MR_Delay"])
+            list.CDR = 1.0
             list.save()
 
             # 이미지 저장
