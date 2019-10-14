@@ -8,11 +8,13 @@ import os
 from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
-
+from .data_learning import learning_about_data
 
 # 메인화면
 def home(request):
     return render(request, 'home.html')
+
+
 
 # 검사자 리스트 화면
 def list(request):
@@ -27,9 +29,13 @@ def list(request):
     lists = paginator.get_page(page)
     return render(request, 'list.html', {'lists':lists})
 
+
+
 # 선택화면
 def select(request):
     return render(request, 'select.html')
+
+
 
 # 채점화면
 def scoring(request):
@@ -90,10 +96,14 @@ def scoring(request):
             dic[i] = check_name
         return render(request, 'scoring.html', {'dic':dic})
 
+
+
 # 결과화면
 def result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'result.html', {'list' : list})
+
+
 
 # 데이터 분석 결과 화면
 def analysis(request):
@@ -141,9 +151,13 @@ def analysis(request):
 
     return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})
 
+
+
 # 이미지 학습
 def image_analysis(request):
     return redirect('home')
+
+
 
 # 데이터 학습
 def data_analysis(request):
@@ -153,19 +167,30 @@ def data_analysis(request):
 
     for subject in subjects:
         subject_dic = {}
-        subject_dic["user"] = subject.user.username
+        # subject_dic["user"] = subject.user.username
         subject_dic["name"] = subject.name
         subject_dic["gender"] = subject.gender
         subject_dic["age"] = subject.age
-        subject_dic["blood_type"] = subject.blood_type
-        subject_dic["height"] = subject.height
-        subject_dic["weight"] = subject.weight
-        subject_dic["past_diagnostic_record"] = subject.past_diagnostic_record
-        subject_dic["pub_date"] = subject.pub_date
-        subject_dic["score"] = subject.score
-        subject_dic["pass_or_fail"] = subject.pass_or_fail
+        # subject_dic["blood_type"] = subject.blood_type
+        # subject_dic["height"] = subject.height
+        # subject_dic["weight"] = subject.weight
+        # subject_dic["past_diagnostic_record"] = subject.past_diagnostic_record
+        # subject_dic["pub_date"] = subject.pub_date
+        # subject_dic["score"] = subject.score
+        # subject_dic["pass_or_fail"] = subject.pass_or_fail
+
+        subject_dic["ASF"] = subject.ASF
+        subject_dic["nWBV"] = subject.nWBV
+        subject_dic["eTIV"] = subject.eTIV
+        subject_dic["CDR"] = subject.CDR
+        subject_dic["MMSE"] = subject.MMSE
+        subject_dic["SES"] = subject.SES
+        subject_dic["educ"] = subject.educ
+        subject_dic["MR_delay"] = subject.MR_delay
+        subject_dic["hand"] = subject.hand
         list_subjects.append(subject_dic)
     MakeCSV(list_subjects)
-    # 테이터 출력용
-    # print(MakeCSV(list_subjects))
+
+    # 학습된 모델 생성
+    learning_about_data()
     return redirect('analysis')

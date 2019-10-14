@@ -39,11 +39,11 @@ with tf.name_scope("inputs"):
     training = tf.placeholder_with_default(False, shape=[], name='training')
 
 conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
-                         strides=conv1_stride, padding=conv1_pad,
-                         activation=tf.nn.relu, name="conv1")
+                        strides=conv1_stride, padding=conv1_pad,
+                        activation=tf.nn.relu, name="conv1")
 conv2 = tf.layers.conv2d(conv1, filters=conv2_fmaps, kernel_size=conv2_ksize,
-                         strides=conv2_stride, padding=conv2_pad,
-                         activation=tf.nn.relu, name="conv2")
+                        strides=conv2_stride, padding=conv2_pad,
+                        activation=tf.nn.relu, name="conv2")
 
 with tf.name_scope("pool3"):
     pool3 = tf.nn.max_pool(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
@@ -79,7 +79,7 @@ def get_model_params():
 def restore_model_params(model_params):
     gvar_names = list(model_params.keys())
     assign_ops = {gvar_name: tf.get_default_graph().get_operation_by_name(gvar_name + "/Assign")
-                  for gvar_name in gvar_names}
+                for gvar_name in gvar_names}
     init_values = {gvar_name: assign_op.inputs[1] for gvar_name, assign_op in assign_ops.items()}
     feed_dict = {init_values[gvar_name]: model_params[gvar_name] for gvar_name in gvar_names}
     tf.get_default_session().run(assign_ops, feed_dict=feed_dict)
