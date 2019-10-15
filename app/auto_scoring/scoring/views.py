@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import ScoreList, Photo
+from .models import ScoreList, Photo, MRIAvg
 from .forms import ScoreListForm
 from django.utils import timezone
 from .imageResizing import image_resizing
@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
 from .data_learning import learning_about_data
+from django.utils import timezone
 
 # 메인화면
 def home(request):
@@ -190,7 +191,17 @@ def data_analysis(request):
         subject_dic["hand"] = subject.hand
         list_subjects.append(subject_dic)
     MakeCSV(list_subjects)
-
+    
+    mriavg = MRIAvg()
+    avg = {}
     # 학습된 모델 생성
-    learning_about_data()
+    avg = learning_about_data()
+    mriavg.avgASF = avg['ASF']
+    mriavg.avgeTIV = avg['eTIV']
+    mriavg.avgMMSE = avg['MMSE']
+    mriavg.avgMR_delay = avg['MR_delay']
+    mriavg.avgnWBV = avg['nWBV']
+    mriavg.avgSES = avg['SES']
+    mriavg.analysis_date = timezone.now()
+    mriavg.save()
     return redirect('analysis')

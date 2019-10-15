@@ -34,6 +34,15 @@ def learning_about_data():
     y = data['CDR'].values
     x_data = data.drop(['CDR'],axis = 1)
 
+    # 평균값
+    avg = {
+        "ASF": data['ASF'].mean(),
+        "nWBV" : data['nWBV'].mean(),
+        "eTIV" : data['eTIV'].mean(),
+        "MMSE" : data['MMSE'].mean(),
+        "SES" : data['SES'].mean(),
+        "MR_delay" : data['MR_delay'].mean(),
+    }
 
     # 머신러닝
     model = LinearRegression()
@@ -43,6 +52,7 @@ def learning_about_data():
     # 저장
     joblib.dump(model, 'data_model.pkl')
 
+    return avg
 
 
 def check_CDR():

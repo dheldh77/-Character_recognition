@@ -35,3 +35,12 @@ class Photo(models.Model):
     image = models.ImageField(upload_to='uploads/', blank=True, null=True) # 이미지
     check = models.IntegerField(blank=True, null=True) # 정답
     grade = models.BooleanField(blank=True, null=True) # 합격 여부
+
+class MRIAvg(models.Model):
+    avgASF = models.FloatField(null=True) # 두개골과 두뇌사이 공간
+    avgnWBV = models.FloatField(null=True) # 전체 뇌용량 정규화
+    avgeTIV = models.IntegerField(null=True) # 추정 내척추수액
+    avgMMSE = models.FloatField(null=True) # 간이 정신 상태 검사
+    avgSES = models.FloatField(null=True) # 사화족 지위
+    avgMR_delay = models.IntegerField(null=True) # 딜레이
+    analysis_date = models.DateTimeField(null=True)
