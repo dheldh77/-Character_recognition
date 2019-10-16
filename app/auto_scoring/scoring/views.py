@@ -3,7 +3,7 @@ from .models import ScoreList, Photo, MRIAvg
 from .forms import ScoreListForm
 from django.utils import timezone
 from .imageResizing import image_resizing
-from .analysis import get_age, get_gender, get_disease
+from .analysis import get_age, get_gender, get_educ
 import os
 from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -133,49 +133,62 @@ def result(request, list_id):
 
 # 데이터 분석 결과 화면
 def analysis(request):
-    lists = ScoreList.objects.all()
+    subjects = ScoreList.objects.all().order_by('-id')
+    total_age = {50:0, 60:0, 70:0, 80:0, 90 : 0}
+    total_age_cnt = {50:0, 60:0, 70:0, 80:0, 90 : 0}
+    total_age_avg = {50:0, 60:0, 70:0, 80:0, 90 : 0}
     total = 0
-    patient = 0
-    # age [30대 이하, 40대, 50대, 60대, 70대, 80대 이상]
-    age_total = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 전체
-    age_patient = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 환자
-    age_rate = { 30:0.0, 40:0.0, 50:0.0, 60:0.0, 70:0, 80:0.0} # 비율
-    # gender ['남', '여']
-    gender_total = {'male':0, 'female':0} # 전체
-    gender_patient = {'male':0, 'female':0} # 환자
-    gender_rate = {'male':0.0, 'female':0.0} # 비율
-    # past_diagnostic_record [stroke, high_blood_pressure, heart_disease, diabetes, cancer, none]
-    disease_patient = {'stroke':0, 'high_blood_pressure':0, 'heart_disease':0, 'diabetes':0, 'cancer':0, 'none':0}
+    total_CDR = 0
 
-    for subject in lists:
-        # 전수 조사
+    total_gender = {'male':0, 'female':0}
+    total_gender_cnt = {'male':0, 'female':0}
+    total_gender_avg = {'male':0, 'female':0}
+
+    total_SES = {1:0, 2:0, 3:0, 4:0, 5:0}
+    total_SES_avg = {1:0, 2:0, 3:0, 4:0, 5:0}
+
+    total_educ = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+    total_educ_cnt = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+    total_educ_avg = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+
+    for subject in subjects:
         total += 1
-        age_total[get_age(subject.age)] += 1
-        gender_total[get_gender(subject.gender)] +=1
+        total_CDR += subject.CDR
 
-        # 치매 진단 환자일 경우
-        if(subject.pass_or_fail == False):
-            patient += 1
-            age_patient[get_age(subject.age)] += 1
-            gender_patient[get_gender(subject.gender)] +=1
-            disease_patient[get_disease(subject.past_diagnostic_record)] += 1
+        total_educ[get_educ(subject.educ)] += subject.CDR
+        total_educ_cnt[get_educ(subject.educ)] += 1
+
+        total_age[get_age(subject.age)] += subject.CDR
+        total_age_cnt[get_age(subject.age)] += 1
+
+        total_gender[get_gender(subject.gender)] += subject.CDR
+        total_gender_cnt[get_gender(subject.gender)] += 1
+
+        total_SES[subject.SES] += subject.CDR
     
-    for key in age_total:
-        if age_total[key] == 0.0:
-            age_rate[key] = 0.0
-            continue
-        age_rate[key] = age_patient[key] / age_total[key]
-
-    for key in gender_total:
-        if gender_total[key] == 0.0:
-            gender_rate[key] = 0.0
-            continue
-        gender_rate[key] = gender_patient[key] / gender_total[key]
+    for key in total_SES:
+        total_SES_avg[key] = total_SES[key] / total_CDR
     
-    print_patient = [patient]
-    print(print_patient)
+    for key in total_age:
+        if total_age_cnt[key] == 0:
+            continue
+        total_age_avg[key] = total_age[key] / total_age_cnt[key]
 
-    return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})
+    for key in total_gender:
+        if total_gender_cnt[key] == 0:
+            continue
+        total_gender_avg[key] = total_gender[key] / total_gender_cnt[key]
+    
+    for key in total_educ:
+        if total_educ_cnt[key] == 0:
+            continue
+        total_educ_avg[key] = total_educ[key] / total_educ_cnt[key]
+    
+    print(total_gender_avg)
+    print(total_SES_avg)
+    print(total_educ_avg)
+
+    return render(request, 'analysis.html',{'total_educ_avg':total_educ_avg, 'total_SES_avg':total_SES_avg, 'total_age_avg':total_age_avg, 'total_gender_avg':total_gender_avg})
 
 
 

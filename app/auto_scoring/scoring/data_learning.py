@@ -3,6 +3,7 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+import math
 
 warnings.filterwarnings("ignore")
 from subprocess import check_output
@@ -38,10 +39,10 @@ def learning_about_data():
     avg = {
         "ASF": data['ASF'].mean(),
         "nWBV" : data['nWBV'].mean(),
-        "eTIV" : data['eTIV'].mean(),
+        "eTIV" : round(data['eTIV'].mean()),
         "MMSE" : data['MMSE'].mean(),
-        "SES" : data['SES'].mean(),
-        "MR_delay" : data['MR_delay'].mean(),
+        "SES" : round(data['SES'].mean()),
+        "MR_delay" : round(data['MR_delay'].mean()),
     }
 
     # 머신러닝
@@ -78,4 +79,13 @@ def check_CDR(check_object):
 
 
     prediction = load_model.predict(temp)
+
+    if prediction < 0.1 :
+        prediction = 0.0
+    elif prediction >= 0.1 and prediction < 0.5:
+        prediction = 0.5
+    elif prediction >=0.5 and prediction < 1.0:
+        prediction = 1.0
+    else:
+        prediction = 2.0
     return prediction

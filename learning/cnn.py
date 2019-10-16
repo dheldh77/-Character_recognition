@@ -1,10 +1,13 @@
 import numpy as np
 import tensorflow as tf
 from imageResizing import LoadData
+from tensorflow.python.framework import ops
 
 def reset_graph(seed = 42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
+    # tf.reset_default_graph()
+    ops.reset_default_graph()
+    # tf.set_random_seed(seed)
+    tf.random.set_seed()
     np.random.seed(seed)
 
 height = 28
