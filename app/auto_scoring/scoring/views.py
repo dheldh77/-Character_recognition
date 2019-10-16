@@ -8,7 +8,7 @@ import os
 from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
-from .data_learning import learning_about_data
+from .data_learning import learning_about_data, check_CDR
 from django.utils import timezone
 
 # 메인화면
@@ -40,7 +40,9 @@ def select(request):
 
 # 채점화면
 def scoring(request):
+    avg = MRIAvg.objects.last()
     if request.method == 'POST':
+        check_CDR_object = {}
         form = ScoreListForm(request.POST)
         if form.is_valid():
             #모델 객체를 db에 저장하지 않은 상태로 반환
@@ -59,15 +61,38 @@ def scoring(request):
                 list.pass_or_fail = True
             else:
                 list.pass_or_fail = False
-            list.ASF = request.POST['ASF']
-            list.nWBV = request.POST['nWBV']
-            list.eTIV = request.POST['eTIV']
+            
+            if(request.POST['MRIcheck'] == 'no'):
+                list.ASF = avg.avgASF
+                list.nWBV = avg.avgnWBV
+                list.eTIV = avg.avgeTIV
+                list.MMSE = avg.avgMMSE
+                list.SES = avg.avgSES
+                list.MR_delay = avg.avgMR_delay
+            else:
+                list.ASF = request.POST['ASF']
+                list.nWBV = request.POST['nWBV']
+                list.eTIV = request.POST['eTIV']
+                list.MMSE = request.POST['MMSE']
+                list.SES = float(request.POST['SES'])
+                list.MR_delay = int(request.POST["MR_Delay"])
+            
             list.hand = int(request.POST['hand'])
-            list.MMSE = request.POST['MMSE']
-            list.SES = float(request.POST['SES'])
             list.educ = request.POST['educ']
-            list.MR_delay = int(request.POST["MR_Delay"])
-            list.CDR = 1.0
+
+            # 임상 치매 여부 판단을 위한 딕셔너리
+            check_CDR_object['gender'] = list.gender
+            check_CDR_object['age'] = list.age
+            check_CDR_object['ASF'] = list.ASF
+            check_CDR_object['nWBV'] = list.nWBV
+            check_CDR_object['eTIV'] = list.eTIV
+            check_CDR_object['MMSE'] = list.MMSE
+            check_CDR_object['SES'] = list.SES
+            check_CDR_object['educ'] = list.educ
+            check_CDR_object['hand'] = list.hand
+            check_CDR_object['MR_delay'] = list.MR_delay
+
+            list.CDR = check_CDR(check_CDR_object)
             list.save()
 
             # 이미지 저장
@@ -95,7 +120,7 @@ def scoring(request):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
-        return render(request, 'scoring.html', {'dic':dic})
+        return render(request, 'scoring.html', {'dic':dic, 'avg':avg})
 
 
 

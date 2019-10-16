@@ -55,22 +55,22 @@ def learning_about_data():
     return avg
 
 
-def check_CDR():
+def check_CDR(check_object):
     #불러오기
     load_model = joblib.load('data_model.pkl')
 
     object = {
-            "gender" : [1],
-            "age" : [103],
-            "ASF": [1.026],
-            "nWBV" : [0.76],
-            "eTIV" : [1711],
-            "CDR" : [2],
-            "MMSE" : [25],
-            "SES" : [1],
-            "educ" : [10],
-            "hand" : [1],
-            "MR_delay" : [540],
+            "gender" : [check_object['gender']],
+            "age" : [check_object['age']],
+            "ASF": [check_object['ASF']],
+            "nWBV" : [check_object['nWBV']],
+            "eTIV" : [check_object['eTIV']],
+            "CDR" : [0],
+            "MMSE" : [check_object['MMSE']],
+            "SES" : [check_object['SES']],
+            "educ" : [check_object['educ']],
+            "hand" : [check_object['hand']],
+            "MR_delay" : [check_object["MR_delay"]],
         }
 
     df = pd.DataFrame(object)
@@ -78,4 +78,4 @@ def check_CDR():
 
 
     prediction = load_model.predict(temp)
-    print(prediction)
+    return prediction
