@@ -3,8 +3,8 @@ import tensorflow as tf
 from imageResizing import LoadData
 
 def reset_graph(seed = 42):
-    tf.reset_default_graph()
-    tf.set_random_seed(seed)
+    tf.compat.v1.reset_default_graph()
+    tf.compat.v1.set_random_seed(seed)
     np.random.seed(seed)
 
 height = 28
@@ -33,20 +33,24 @@ n_outputs = 2
 reset_graph()
 
 with tf.name_scope("inputs"):
-    X = tf.placeholder(tf.float32, shape=[None, n_inputs], name="X")
+    X = tf.compat.v1.placeholder(tf.float32, shape=[None, n_inputs], name="X")
     X_reshaped = tf.reshape(X, shape=[-1, height, width, channels])
-    y = tf.placeholder(tf.int32, shape=[None], name="y")
-    training = tf.placeholder_with_default(False, shape=[], name='training')
+    tf.compat.v1.summary.image('input', X_reshaped, 10)
+    y = tf.compat.v1.placeholder(tf.int32, shape=[None], name="y")
+    training = tf.compat.v1.placeholder_with_default(False, shape=[], name='training')
 
-conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
+with tf.name_scope("conv1"):
+    conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
                          strides=conv1_stride, padding=conv1_pad,
                          activation=tf.nn.relu, name="conv1")
+
+
 conv2 = tf.layers.conv2d(conv1, filters=conv2_fmaps, kernel_size=conv2_ksize,
                          strides=conv2_stride, padding=conv2_pad,
                          activation=tf.nn.relu, name="conv2")
 
 with tf.name_scope("pool3"):
-    pool3 = tf.nn.max_pool(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
+    pool3 = tf.nn.max_pool2d(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
     pool3_flat = tf.reshape(pool3, shape=[-1, pool3_fmaps * 14 * 14])
     pool3_flat_drop = tf.layers.dropout(pool3_flat, conv2_dropout_rate, training=training)
 
@@ -59,6 +63,8 @@ with tf.name_scope("output"):
     Y_proba = tf.nn.softmax(logits, name="Y_proba")
 
 with tf.name_scope("train"):
+    print(logits.get_shape())
+    print(y.get_shape())
     xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=y)
     loss = tf.reduce_mean(xentropy)
     optimizer = tf.train.AdamOptimizer()
@@ -84,7 +90,8 @@ def restore_model_params(model_params):
     feed_dict = {init_values[gvar_name]: model_params[gvar_name] for gvar_name in gvar_names}
     tf.get_default_session().run(assign_ops, feed_dict=feed_dict)
 
-(X_train, y_train), (X_test, y_test) = LoadData()
+
+(X_train, y_train), (X_test, y_test) = LoadData(9)
 print('Data loaded')
 X_train = X_train.astype(np.float32).reshape(-1, 28 * 28)
 X_test = X_test.astype(np.float32).reshape(-1, 28 * 28)
@@ -101,8 +108,8 @@ def shuffle_batch(X, y, batch_size):
         yield X_batch, y_batch
 
 
-n_epochs = 1000
-batch_size = 50
+n_epochs = 150
+batch_size = 5
 
 best_loss_val = np.infty
 check_interval = 500
@@ -110,13 +117,20 @@ checks_since_last_progress = 0
 max_checks_without_progress = 20
 best_model_params = None
 
+for var in tf.trainable_variables():
+    tf.summary.histogram(var.name, var)
+merged = tf.compat.v1.summary.merge_all()
+writer = tf.compat.v1.summary.FileWriter('./train')
+
+
 with tf.Session() as sess:
     init.run()
+    tf.compat.v1.global_variables_initializer().run()
     for epoch in range(n_epochs):
         n_batches = len(X_train) // batch_size
         for iteration in range(n_batches):
             X_batch, y_batch = next(shuffle_batch(X_train, y_train, batch_size))
-            sess.run(training_op, feed_dict={X: X_batch, y: y_batch, training: True})
+            summary, _ = sess.run([merged, training_op], feed_dict={X: X_batch, y: y_batch, training: True})
             if iteration % check_interval == 0:
                 loss_val = loss.eval(feed_dict={X: X_valid, y: y_valid})
                 if loss_val < best_loss_val:
@@ -125,6 +139,7 @@ with tf.Session() as sess:
                     best_model_params = get_model_params()
                 else:
                     checks_since_last_progress += 1
+            writer.add_summary(summary, iteration)
         acc_batch = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
         acc_val = accuracy.eval(feed_dict={X: X_valid, y: y_valid})
         print("에포크 {}, 배치 데이터 정확도: {:.4f}%, 검증 세트 정확도: {:.4f}%, 검증 세트에서 최선의 손실: {:.6f}".format(
@@ -132,6 +147,7 @@ with tf.Session() as sess:
         if checks_since_last_progress > max_checks_without_progress:
             print("조기 종료!")
             break
+    writer.close()
 
     if best_model_params:
         restore_model_params(best_model_params)

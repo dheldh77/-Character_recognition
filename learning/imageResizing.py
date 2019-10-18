@@ -1,25 +1,18 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow import keras
 import os
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
 from numpy import array
 
 TRAIN_DIR = './data/train/'
 TEST_DIR = './data/test/'
+PREDICT_DIR = './data/predict/'
+POSITIVE = 1
+NEGATIVE = 0
+
 p_train_folder_list = array(os.listdir(TRAIN_DIR + 'positive'))
 n_train_folder_list = array(os.listdir(TRAIN_DIR + 'negative'))
 p_test_folder_list = array(os.listdir(TEST_DIR + 'positive'))
 n_test_folder_list = array(os.listdir(TEST_DIR + 'negative'))
-
-train_input = []
-train_number = []
-train_label = []
-test_input = []
-test_label = []
 """
 label_encoder = LabelEncoder()
 integer_encoded = label_encoder.fit_transform(p_train_folder_list)
@@ -30,8 +23,9 @@ onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
 print(onehot_encoded)
 """
 
+
 #이미지 중앙정렬, 사이즈 축소
-def ImageTunning(image):
+def ImageTuning(image):
     for y in range(0, len(image)):
         for x in range(0, 290):
             if image[y, x][3] == 0:
@@ -40,14 +34,28 @@ def ImageTunning(image):
     imgray = ~imgray
     ret, thresh = cv2.threshold(imgray, 127, 255, cv2.THRESH_BINARY)
 
-    contours, hierachy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierachy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    print(len(contours))
 
-    cnt = contours[0]
+    x, y, w, h = cv2.boundingRect(contours[0])
+    X = x + w
+    Y = y + h
+    for cnt in contours[1:]:
+        x_, y_, w_, h_ = cv2.boundingRect(cnt)
+        X_ = x_ + w_
+        Y_ = y_ + h_
+        if x_ < x:
+            x = x_
+        if y_ < y:
+            y = y_
+        if X_ > X:
+            X = X_
+        if Y_ > Y:
+            Y = Y_
 
-    x, y, w, h = cv2.boundingRect(cnt)
-    # imgray = cv2.rectangle(imgray, (x, y), (x + w, y + h), 255, 2)
+    # imgray = cv2.rectangle(imgray, (x, y), (X, Y), 255, 2)
 
-    M = np.float32([[1, 0, len(image) / 2 - (x + w / 2)], [0, 1, 290 / 2 - (y + h / 2)]])
+    M = np.float32([[1, 0, len(image) / 2 - ((X + x) / 2)], [0, 1, 290 / 2 - ((Y + y) / 2)]])
 
     imgray = cv2.warpAffine(imgray, M, (len(image), 290))
     image = cv2.resize(imgray, (28, 28), interpolation=cv2.INTER_AREA)
@@ -56,128 +64,97 @@ def ImageTunning(image):
     image /= 255.0
     return image
 
-def PostProcessing(path, PN):
-    path = os.path.join(path, PN) + '/1/'
+def PostProcessingWithoutLabel(path):
+    """
+    해당 path의 이미지를 전처리 합니다.
+    :param path: 구체적인 데이터 경로 ex)./data/train/positive/1/1.png
+    :return: input(numpy.array type의 28X28크기의 0~1사이 값을 가진 전처리 이미지)
+    """
+    img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    img = ImageTuning(img)
+    return img
+
+
+def PostProcessingWithLabel(path, PN):
+    """
+    해당 path의 이미지를 라벨과 함께 전처리 합니다.
+    :param path: 구체적인 데이터 경로 ex)./data/train/positive/1/1.png
+    :param PN: 1(POSITIVE)-positive, 0(NEGATIVE)-negative
+    :return: input, label(28X28크기를 가진 numpy.array type의 0~1사이 값을 가진 전처리 이미지와 1크기를가진 numpy.array type의 0또는 1의 값을 가진 라벨)
+    """
+    if (PN == POSITIVE):
+        return PostProcessingWithoutLabel(path), np.array(1)
+    elif (PN == NEGATIVE):
+        return PostProcessingWithoutLabel(path), np.array(0)
+    else:
+        exit()
+
+
+def GetDataWithPP(dir, number):
+    p_path = dir + 'positive/'
+    n_path = dir + 'negative/'
+    input_data = []
+    label_data = []
+
+    path = p_path + str(number) + '/'
     img_list = os.listdir(path)
-    data_input = []
-    data_label = []
+
     for img in img_list:
         img_path = os.path.join(path, img)
-        img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-        img = ImageTunning(img)
-        data_input.append(np.array(img))
-        if (PN == 'positive'):
-            data_label.append(np.array(1))
-        else:
-            data_label.append(np.array(0))
-    return data_input, data_label
+        input, label = PostProcessingWithLabel(img_path, POSITIVE)
+        input_data.append(input)
+        label_data.append(label)
 
-def LoadData():
-    p_train_input, p_train_label = PostProcessing(TRAIN_DIR, 'positive')
-    n_train_input, n_train_label = PostProcessing(TRAIN_DIR, 'negative')
-    p_test_input, p_test_label = PostProcessing(TEST_DIR, 'positive')
-    n_test_input, n_test_label = PostProcessing(TEST_DIR, 'negative')
-    train_data = (np.array(p_train_input + n_train_input), np.array(p_train_label + n_train_label))
-    test_data = (np.array(p_test_input + n_test_input), np.array(p_test_label + n_test_label))
-    return train_data, test_data
+    path = n_path + str(number) + '/'
+    img_list = os.listdir(path)
 
-(X_train, y_train), (X_test, y_test) = LoadData()
-print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
-print(X_train, y_train)
-print(X_test, y_test)
+    for img in img_list:
+        img_path = os.path.join(path, img)
+        input, label = PostProcessingWithLabel(img_path, NEGATIVE)
+        input_data.append(input)
+        label_data.append(label)
 
-# for index in range(len(p_train_folder_list)):
-#train input
-# p_path = os.path.join(TRAIN_DIR + 'positive', p_train_folder_list[0])
-# n_path = os.path.join(TRAIN_DIR + 'negative', n_train_folder_list[0])
-# p_path += '/'
-# n_path += '/'
-# img_list = os.listdir(p_path)
-# for img in img_list:
-#     img_path = os.path.join(p_path, img)
-#     img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-#     img = ImageTunning(img)
-#     #img = np.array(img)
-#     img = img.reshape(784)
-#     train_input.append(img)
-#     # train_number.append([np.array(onehot_encoded[index])])
-#     train_label.append(np.array([1]))
-# img_list = os.listdir(n_path)
-# for img in img_list:
-#     img_path = os.path.join(n_path, img)
-#     img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-#     img = ImageTunning(img)
-#     #img = np.array(img)
-#     img = img.reshape(784)
-#     train_input.append(img)
-#     # train_number.append([np.array(onehot_encoded[index])])
-#     train_label.append(np.array([0]))
-#
-# train_input = np.array(train_input)
-# train_label = np.array(train_label)
-#
-# #test input
-# p_path = os.path.join(TEST_DIR + 'positive', p_test_folder_list[0])
-# n_path = os.path.join(TEST_DIR + 'negative', n_test_folder_list[0])
-# p_path += '/'
-# n_path += '/'
-# img_list = os.listdir(p_path)
-# for img in img_list:
-#     img_path = os.path.join(p_path, img)
-#     img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-#     img = ImageTunning(img)
-#     #img = np.array(img)
-#     img = img.reshape(784)
-#     test_input.append(img)
-#     # train_number.append([np.array(onehot_encoded[index])])
-#     test_label.append(np.array([1]))
-# img_list = os.listdir(n_path)
-# for img in img_list:
-#     img_path = os.path.join(n_path, img)
-#     img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-#     img = ImageTunning(img)
-#     #img = np.array(img)
-#     img = img.reshape(784)
-#     test_input.append(img)
-#     # train_number.append([np.array(onehot_encoded[index])])
-#     test_label.append(np.array([0]))
-#
-# test_input = np.array(test_input)
-# test_label = np.array(test_label)
+    return np.array(input_data), np.array(label_data)
 
 
-# train = zip(train_input, train_label)
-# test = zip(test_input, test_label)
-#
-# split = dict(train = train, test = test)
-#
-# options = tf.python_io.TFRecordOptions(compression_type=tf.python_io.TFRecordCompressionType.GZIP)
-#
-# for key in split.keys():
-#     dataset = split.get(key)
-#     writer = tf.python_io.TFRecordWriter(path='./npydata/{}.tfrecords'.format(key), options = options)
-#     for data, label in dataset:
-#         image = data.tobytes()
-#         example = tf.train.Example(features=tf.train.Features(feature = {
-#             'label' : tf.train.Feature(int64_list = tf.train.Int64List(value = [label])),
-#             'image' : tf.train.Feature(bytes_list = tf.train.BytesList(value = [image]))
-#         }))
-#         writer.write(example.SerializeToString())
-#     else:
-#         writer.close()
-#         print('{} was converted to tfrecords'.format(key))
+def SaveData():
+    for i in range(1, 10):
+        input, label = GetDataWithPP(TRAIN_DIR, i)
+        path = "./post_data/train/" + str(i)
+        np.savez(path, x = input, y = label)
+        input, label = GetDataWithPP(TEST_DIR, i)
+        path = "./post_data/test/" + str(i)
+        np.savez(path, x = input, y = label)
 
 
-#np.save('./npydata/train/1.npy', np.array([train_input, train_label]))
-#np.save('./npydata/test/1.npy', np.array([test_input, test_label]))
-#train_input = np.reshape(train_input, (-1, 784))
-# train_number = np.reshape(train_number, (-1, 9))
-# train_input = np.array(train_input).astype(np.float32)
-# train_label = np.array(train_label).astype(np.float32)
-#np.save("train_data.npy", train_input)
-# np.save("train_number.npy", train_number)
-#np.save("train_label.npy", train_label)
+def LoadData(number):
+    path = "./post_data/train/" + str(number) + ".npz"
+    if not os.path.isfile(path):
+        SaveData()
+    train = np.load(path)
+    train_input = train['x']
+    train_label = train['y']
+    path = "./post_data/test/" + str(number) + ".npz"
+    if not os.path.isfile(path):
+        SaveData()
+    test = np.load(path)
+    test_input = test['x']
+    test_label = test['y']
+    return (train_input, train_label), (test_input, test_label)
 
-#train_input = train_input / 255.0
-#test_input = test_input / 255.0
 
+def LoadTrainDataWithPP(number):
+    return GetDataWithPP(TRAIN_DIR, number)
+
+
+def LoadTestDataWithPP(number):
+    return GetDataWithPP(TEST_DIR, number)
+
+
+def LoadDataWithPP(number):
+    """
+    해당 number의 train, test 데이터를 불러옵니다.
+    :param number: 가져올 데이터의 번호
+    :return: (train_input, train_label), (test_input, test_label)
+    """
+    return (LoadTrainDataWithPP(number)), (LoadTestDataWithPP(number))
