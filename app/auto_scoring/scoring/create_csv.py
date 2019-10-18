@@ -1,44 +1,47 @@
 import pandas as pd
-
+# 데이터베이스에 있는 환자들에 대한 정보를 csv로 저장
 def MakeCSV(patients):
-    users = []
     names = []
     genders = []
     ages = []
-    blood_types = []
-    heights = []
-    weights = []
-    past_diagnostic_records = []
-    pub_dates = []
-    scores = []
-    pass_or_fails = []
+    ASFs = []
+    nWBVs = []
+    eTIVs = []
+    CDRs = []
+    MMSEs = []
+    SESs = []
+    educs = []
+    MR_delays = []
+    hands = []
 
     for patient in patients:
-        users.append(patient['user'])
         names.append(patient['name'])
         genders.append(patient['gender'])
         ages.append(patient['age'])
-        blood_types.append(patient['blood_type'])
-        heights.append(patient['height'])
-        weights.append(patient['weight'])
-        past_diagnostic_records.append(patient['past_diagnostic_record'])
-        pub_dates.append(patient['pub_date'])
-        scores.append(patient['score'])
-        pass_or_fails.append(patient['pass_or_fail'])
+        ASFs.append(patient['ASF'])
+        nWBVs.append(patient['nWBV'])
+        eTIVs.append(patient['eTIV'])
+        CDRs.append(patient['CDR'])
+        MMSEs.append(patient['MMSE'])
+        SESs.append(patient['SES'])
+        educs.append(patient['educ'])
+        MR_delays.append(patient['MR_delay'])
+        hands.append(patient['hand'])
 
     
     data = {
-        "user" : users,
         "name" : names,
         "gender" : genders,
         "age" : ages,
-        "blood_type" : blood_types,
-        "height" : heights,
-        "weight" : weights,
-        "past_diagnostic_record" : past_diagnostic_records,
-        "pub_date": pub_dates,
-        "score": scores,
-        "pass_or_fail": pass_or_fails
+        "ASF" : ASFs,
+        "nWBV" : nWBVs,
+        "eTIV" : eTIVs,
+        "CDR" : CDRs,
+        "MMSE": MMSEs,
+        "SES": SESs,
+        "educ": educs,
+        "MR_delay": MR_delays,
+        "hand": hands,
     }
 
     # 데이터 프레임 만들고 -> csv파일로 저장

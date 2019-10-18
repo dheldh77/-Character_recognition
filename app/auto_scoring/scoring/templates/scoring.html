@@ -66,6 +66,28 @@
                         <label for="pub_date">진단일</label>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input id="educ" name="educ" type="number" class="validate">
+                        <label for="educ">교육 기간</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="hand">
+                            <option value="" disabled selected>손잡이</option>
+                            <option value="1">오른손</option>
+                            <option value="2">왼손</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <select name="MRIcheck" id="check_mri">
+                            <option value="" disabled selected>MRI 검사 여부</option>
+                            <option value="yes">예</option>
+                            <option value="no">아니오</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="submit">
                     <a onclick="cust('second')" class="waves-effect waves-light btn">Next</a>
                 </div>
@@ -82,18 +104,15 @@
                         <label for="nWBV">nWBV</label>
                     </div>
                 </div>
-                <!-- eTIV: integer, hand: (1, 2) 입력 -->
+                <!-- eTIV: integer, MR_Delay: integer 입력 -->
                 <div class="row">
                     <div class="input-field col s6">
                         <input name="eTIV" id="eTIV" type="number" class="validate">
                         <label for="eTIV">eTIV</label>
                     </div>
                     <div class="input-field col s6">
-                        <select name="hand">
-                            <option value="" disabled selected>손잡이</option>
-                            <option value="1">오른손</option>
-                            <option value="2">왼손</option>
-                        </select>
+                        <input id="MR_Delay" name="MR_Delay" type="number" class="validate">
+                        <label for="MR_Delay">MR_Delay</label>
                     </div>
                 </div>
                 <!-- MMSE: float, SES: float(1.0, 2.0 ... 5.0) 입력 -->
@@ -111,17 +130,6 @@
                             <option value="4.0">4.0</option>
                             <option value="5.0">5.0</option>
                         </select>
-                    </div>
-                </div>
-                <!-- educ: integer, MR_Delay: integer 입력 -->
-                <div class="row">
-                    <div class="input-field col s6">
-                        <input id="educ" name="educ" type="number" class="validate">
-                        <label for="educ">교육 기간</label>
-                    </div>
-                    <div class="input-field col s6">
-                        <input id="MR_Delay" name="MR_Delay" type="number" class="validate">
-                        <label for="MR_Delay">MR_Delay</label>
                     </div>
                 </div>
                 <div class="submit">
@@ -170,11 +178,21 @@
         </form>
     </div>
 </section>
+
 <script>
     function cust(arg){
         if(arg == 'second'){
-            $('#default').css('display','none');
-            $('#second').css('display','unset');
+            checkmri = $('#check_mri').val();
+            // mri 검사 여부에 따른 평가지표 제출
+            if(checkmri == 'yes'){
+                $('#default').css('display','none');
+                $('#second').css('display','unset');
+            }
+            else{
+                $('#default').css('display','none');
+                $('#1').css('display','unset');
+                $('#con_change').css('width', '500px');
+            }
         }
         else if(arg == '0'){
             $('#second').css('display','none');

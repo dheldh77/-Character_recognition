@@ -1,18 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import ScoreList, Photo
+from .models import ScoreList, Photo, MRIAvg
 from .forms import ScoreListForm
 from django.utils import timezone
 from .imageResizing import image_resizing
-from .analysis import get_age, get_gender, get_disease
+from .analysis import get_age, get_gender, get_educ
 import os
 from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
-
+from .data_learning import learning_about_data, check_CDR
+from django.utils import timezone
 
 # 메인화면
 def home(request):
     return render(request, 'home.html')
+
+
 
 # 검사자 리스트 화면
 def list(request):
@@ -27,13 +30,19 @@ def list(request):
     lists = paginator.get_page(page)
     return render(request, 'list.html', {'lists':lists})
 
+
+
 # 선택화면
 def select(request):
     return render(request, 'select.html')
 
+
+
 # 채점화면
 def scoring(request):
+    avg = MRIAvg.objects.last()
     if request.method == 'POST':
+        check_CDR_object = {}
         form = ScoreListForm(request.POST)
         if form.is_valid():
             #모델 객체를 db에 저장하지 않은 상태로 반환
@@ -52,15 +61,38 @@ def scoring(request):
                 list.pass_or_fail = True
             else:
                 list.pass_or_fail = False
-            list.ASF = request.POST['ASF']
-            list.nWBV = request.POST['nWBV']
-            list.eTIV = request.POST['eTIV']
+            
+            if(request.POST['MRIcheck'] == 'no'):
+                list.ASF = avg.avgASF
+                list.nWBV = avg.avgnWBV
+                list.eTIV = avg.avgeTIV
+                list.MMSE = avg.avgMMSE
+                list.SES = avg.avgSES
+                list.MR_delay = avg.avgMR_delay
+            else:
+                list.ASF = request.POST['ASF']
+                list.nWBV = request.POST['nWBV']
+                list.eTIV = request.POST['eTIV']
+                list.MMSE = request.POST['MMSE']
+                list.SES = float(request.POST['SES'])
+                list.MR_delay = int(request.POST["MR_Delay"])
+            
             list.hand = int(request.POST['hand'])
-            list.MMSE = request.POST['MMSE']
-            list.SES = float(request.POST['SES'])
             list.educ = request.POST['educ']
-            list.MR_delay = int(request.POST["MR_Delay"])
-            list.CDR = 1.0
+
+            # 임상 치매 여부 판단을 위한 딕셔너리
+            check_CDR_object['gender'] = list.gender
+            check_CDR_object['age'] = list.age
+            check_CDR_object['ASF'] = list.ASF
+            check_CDR_object['nWBV'] = list.nWBV
+            check_CDR_object['eTIV'] = list.eTIV
+            check_CDR_object['MMSE'] = list.MMSE
+            check_CDR_object['SES'] = list.SES
+            check_CDR_object['educ'] = list.educ
+            check_CDR_object['hand'] = list.hand
+            check_CDR_object['MR_delay'] = list.MR_delay
+
+            list.CDR = check_CDR(check_CDR_object)
             list.save()
 
             # 이미지 저장
@@ -88,62 +120,83 @@ def scoring(request):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
-        return render(request, 'scoring.html', {'dic':dic})
+        return render(request, 'scoring.html', {'dic':dic, 'avg':avg})
+
+
 
 # 결과화면
 def result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'result.html', {'list' : list})
 
+
+
 # 데이터 분석 결과 화면
 def analysis(request):
-    lists = ScoreList.objects.all()
+    subjects = ScoreList.objects.all().order_by('-id')
+    total_age = {50:0, 60:0, 70:0, 80:0, 90 : 0}
+    total_age_cnt = {50:0, 60:0, 70:0, 80:0, 90 : 0}
+    total_age_avg = {50:0, 60:0, 70:0, 80:0, 90 : 0}
     total = 0
-    patient = 0
-    # age [30대 이하, 40대, 50대, 60대, 70대, 80대 이상]
-    age_total = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 전체
-    age_patient = { 30:0, 40:0, 50:0, 60:0, 70:0, 80:0} # 환자
-    age_rate = { 30:0.0, 40:0.0, 50:0.0, 60:0.0, 70:0, 80:0.0} # 비율
-    # gender ['남', '여']
-    gender_total = {'male':0, 'female':0} # 전체
-    gender_patient = {'male':0, 'female':0} # 환자
-    gender_rate = {'male':0.0, 'female':0.0} # 비율
-    # past_diagnostic_record [stroke, high_blood_pressure, heart_disease, diabetes, cancer, none]
-    disease_patient = {'stroke':0, 'high_blood_pressure':0, 'heart_disease':0, 'diabetes':0, 'cancer':0, 'none':0}
+    total_CDR = 0
 
-    for subject in lists:
-        # 전수 조사
+    total_gender = {'male':0, 'female':0}
+    total_gender_cnt = {'male':0, 'female':0}
+    total_gender_avg = {'male':0, 'female':0}
+
+    total_SES = {1:0, 2:0, 3:0, 4:0, 5:0}
+    total_SES_avg = {1:0, 2:0, 3:0, 4:0, 5:0}
+
+    total_educ = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+    total_educ_cnt = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+    total_educ_avg = {8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0,15:0, 16:0, 17:0, 18:0, 19:0, 20:0}
+
+    for subject in subjects:
         total += 1
-        age_total[get_age(subject.age)] += 1
-        gender_total[get_gender(subject.gender)] +=1
+        total_CDR += subject.CDR
 
-        # 치매 진단 환자일 경우
-        if(subject.pass_or_fail == False):
-            patient += 1
-            age_patient[get_age(subject.age)] += 1
-            gender_patient[get_gender(subject.gender)] +=1
-            disease_patient[get_disease(subject.past_diagnostic_record)] += 1
+        total_educ[get_educ(subject.educ)] += subject.CDR
+        total_educ_cnt[get_educ(subject.educ)] += 1
+
+        total_age[get_age(subject.age)] += subject.CDR
+        total_age_cnt[get_age(subject.age)] += 1
+
+        total_gender[get_gender(subject.gender)] += subject.CDR
+        total_gender_cnt[get_gender(subject.gender)] += 1
+
+        total_SES[subject.SES] += subject.CDR
     
-    for key in age_total:
-        if age_total[key] == 0.0:
-            age_rate[key] = 0.0
-            continue
-        age_rate[key] = age_patient[key] / age_total[key]
-
-    for key in gender_total:
-        if gender_total[key] == 0.0:
-            gender_rate[key] = 0.0
-            continue
-        gender_rate[key] = gender_patient[key] / gender_total[key]
+    for key in total_SES:
+        total_SES_avg[key] = total_SES[key] / total_CDR
     
-    print_patient = [patient]
-    print(print_patient)
+    for key in total_age:
+        if total_age_cnt[key] == 0:
+            continue
+        total_age_avg[key] = total_age[key] / total_age_cnt[key]
 
-    return render(request, 'analysis.html',{'gender_rate':gender_rate, 'age_rate':age_rate, 'disease_patient':disease_patient, 'patients':print_patient})
+    for key in total_gender:
+        if total_gender_cnt[key] == 0:
+            continue
+        total_gender_avg[key] = total_gender[key] / total_gender_cnt[key]
+    
+    for key in total_educ:
+        if total_educ_cnt[key] == 0:
+            continue
+        total_educ_avg[key] = total_educ[key] / total_educ_cnt[key]
+    
+    print(total_gender_avg)
+    print(total_SES_avg)
+    print(total_educ_avg)
+
+    return render(request, 'analysis.html',{'total_educ_avg':total_educ_avg, 'total_SES_avg':total_SES_avg, 'total_age_avg':total_age_avg, 'total_gender_avg':total_gender_avg})
+
+
 
 # 이미지 학습
 def image_analysis(request):
     return redirect('home')
+
+
 
 # 데이터 학습
 def data_analysis(request):
@@ -153,19 +206,40 @@ def data_analysis(request):
 
     for subject in subjects:
         subject_dic = {}
-        subject_dic["user"] = subject.user.username
+        # subject_dic["user"] = subject.user.username
         subject_dic["name"] = subject.name
         subject_dic["gender"] = subject.gender
         subject_dic["age"] = subject.age
-        subject_dic["blood_type"] = subject.blood_type
-        subject_dic["height"] = subject.height
-        subject_dic["weight"] = subject.weight
-        subject_dic["past_diagnostic_record"] = subject.past_diagnostic_record
-        subject_dic["pub_date"] = subject.pub_date
-        subject_dic["score"] = subject.score
-        subject_dic["pass_or_fail"] = subject.pass_or_fail
+        # subject_dic["blood_type"] = subject.blood_type
+        # subject_dic["height"] = subject.height
+        # subject_dic["weight"] = subject.weight
+        # subject_dic["past_diagnostic_record"] = subject.past_diagnostic_record
+        # subject_dic["pub_date"] = subject.pub_date
+        # subject_dic["score"] = subject.score
+        # subject_dic["pass_or_fail"] = subject.pass_or_fail
+
+        subject_dic["ASF"] = subject.ASF
+        subject_dic["nWBV"] = subject.nWBV
+        subject_dic["eTIV"] = subject.eTIV
+        subject_dic["CDR"] = subject.CDR
+        subject_dic["MMSE"] = subject.MMSE
+        subject_dic["SES"] = subject.SES
+        subject_dic["educ"] = subject.educ
+        subject_dic["MR_delay"] = subject.MR_delay
+        subject_dic["hand"] = subject.hand
         list_subjects.append(subject_dic)
     MakeCSV(list_subjects)
-    # 테이터 출력용
-    # print(MakeCSV(list_subjects))
+    
+    mriavg = MRIAvg()
+    avg = {}
+    # 학습된 모델 생성
+    avg = learning_about_data()
+    mriavg.avgASF = avg['ASF']
+    mriavg.avgeTIV = avg['eTIV']
+    mriavg.avgMMSE = avg['MMSE']
+    mriavg.avgMR_delay = avg['MR_delay']
+    mriavg.avgnWBV = avg['nWBV']
+    mriavg.avgSES = avg['SES']
+    mriavg.analysis_date = timezone.now()
+    mriavg.save()
     return redirect('analysis')

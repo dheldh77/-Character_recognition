@@ -3,23 +3,26 @@
 {% load static %}
 <section class="chart">
     <!-- 환자에 대한 정보가 저장되어있는 딕셔너리 전부 불러옴 -->
-    {% for key, value in age_rate.items %}
+    {% for key, value in total_age_avg.items %}
         <input id="{{key}}" type="hidden" value="{{value}}">
     {% endfor %}
-    {% for key, value in gender_rate.items %}
+
+    {% for key, value in total_gender_avg.items %}
         <input id="{{key}}" type="hidden" value="{{value}}">
     {% endfor %}
-    {% for key, value in disease_patient.items %}
+
+    {% for key, value in total_SES_avg.items %}
         <input id="{{key}}" type="hidden" value="{{value}}">
     {% endfor %}
-    {% for patient in patients %}
-        <input id="patient" type="hidden" value="{{patient}}">
+
+    {% for key, value in total_educ_avg.items %}
+        <input id="{{key}}" type="hidden" value="{{value}}">
     {% endfor%}
     <div class="con">
         <!-- Gender-Dementia chart -->
         <div class="chart_menu">
             <div class="title">
-                <h2><i class="material-icons">insert_chart</i>Gender-Dementia chart</h2>
+                <h2><i class="material-icons">insert_chart</i>성별 임상치매척도</h2>
             </div>
             <div class="sub_title">
                 <p>correlation chart about gender and demetia patient rate</p>
@@ -29,7 +32,7 @@
         <!-- Age-Grade chart -->
         <div class="chart_menu">
             <div class="title">
-                <h2><i class="material-icons">pie_chart</i>Age-Grade chart</h2>
+                <h2><i class="material-icons">pie_chart</i>연령별 임상치매척도</h2>
             </div>
             <div class="sub_title">
                 <p>correlation chart about age rate and grade</p>
@@ -39,7 +42,7 @@
         <!-- Disease-Dementia chart -->
         <div class="chart_menu">
             <div class="title">
-                <h2><i class="material-icons">pie_chart</i>Disease-Dementia chart</h2>
+                <h2><i class="material-icons">pie_chart</i>사회적 지위별 임상치매척도</h2>
             </div>
             <div class="sub_title">
                 <p>correlation chart about age rate and grade</p>
@@ -49,7 +52,7 @@
         <!-- Question-Correct rate chart -->
         <div class="chart_menu">
             <div class="title">
-                <h2><i class="material-icons">insert_chart</i>Question-Correct rate chart</h2>
+                <h2><i class="material-icons">insert_chart</i>교육 기간 별 임상치매척도</h2>
             </div>
             <div class="sub_title">
                 <p>correlation chart about question and correct rate</p>
@@ -76,9 +79,9 @@
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['male', 'female'],
+            labels: ['남성', '여성'],
             datasets: [{
-                label: '# 치매 진단 환자 / 검사자',
+                label: '# 임상치매척도(CDR)',
                 data: gender_arr,
                 backgroundColor: [
                     'rgba(54, 162, 235, 0.2)',
@@ -95,8 +98,7 @@
             scales: {
                 yAxes: [{
                     ticks: {
-                        min: 0.3,
-                        max: 1.0,
+                        min: 0.1,
                         stepSize: 0.1
                     }
                 }]
@@ -111,7 +113,7 @@
     // 배열 선언
     var age_arr = new Array();
     // 딕셔너리 넘겨받는 반복문
-    for(var i = 30; i < 90; i += 10){
+    for(var i = 50; i < 100; i += 10){
         temp = '#' + String(i);
         age = $(temp).val();
         age = age.substr(0,4);
@@ -121,9 +123,9 @@
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['30대 이하', '40대', '50대', '60대', '70대', '80대 이상'],
+            labels: ['50대 이하', '60대', '70대', '80대', '90대 이상'],
             datasets: [{
-                label: '# 환자 비율',
+                label: '# 임상치매척도(CDR)',
                 data: age_arr,
                 backgroundColor: [
                     'rgba(54, 162, 235, 0.2)',
@@ -153,39 +155,31 @@
         options: {
             scales: {
                 yAxes: [{
-                    ticks: {
-                        min: 0.3,
-                        max: 1.0,
-                        stepSize: 0.1
-                    }
                 }]
             }
         }
     });
 </script>
-<!-- Disease-Dementia chart -->
+<!-- SES-Dementia chart -->
 <script>
     var ctx = document.getElementById('disease_chart');
     // 배열 선언
-    var disease_arr = new Array();
-    // html에서 값 불러옴
-    patient = $('#patient').val();
-    stroke = Number($('#stroke').val()) / Number(patient);
-    heart_disease = Number($('#heart_disease').val()) / Number(patient);
-    high_blood_pressure = Number($('#high_blood_pressure ').val()) / Number(patient);
-    diabetes= Number($('#diabetes').val()) / Number(patient);
-    cancer = Number($('#cancer').val()) / Number(patient);
-    none = Number($('#none').val()) / Number(patient);
+    var SES_arr = new Array();
+    
+    for(var i = 1; i < 6; i++){
+        temp = '#' + String(i);
+        SES = $(temp).val();
+        SES_arr.push(Number(SES));
+    }
 
-    disease_arr = [stroke, heart_disease, high_blood_pressure, diabetes, cancer, none];
     
     var myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['뇌졸증', '심장병', '고혈압', '당뇨병', '기타(암포함)', '없음'],
+            labels: ['5(하위)', '4(중하)', '3(중간)', '2(중상)', '1(상위)'],
             datasets: [{
                 label: '# 환자 비율',
-                data: disease_arr,
+                data: SES_arr,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -217,31 +211,56 @@
     });
 </script>
 
-<!-- number pass chart -->
+<!-- educ-dementia chart -->
 <script>
     var ctx = document.getElementById('number_pass_chart');
+
+    var educ_arr = new Array();
+    
+    for(var i = 8; i < 21; i++){
+        temp = '#' + String(i);
+        educ = $(temp).val();
+        educ = educ.substr(0,4);
+        educ_arr.push(Number(educ));
+    }
+
+    console.log(educ_arr);
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['1번', '2번', '3번', '4번', '5번', '6번', '7번', '8번', '9번', '10번'],
+            labels: ['8년 이하', '9년', '10년', '11년', '12년', '13년', '14년', '15년', '16년', '17년', '18년', '19년', '20년 이상'],
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3, 4, 5, 6, 3],
+                label: '# 임상치매척도(CDR)',
+                data: educ_arr,
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
+                    'rgb(211,47,47,0.2)',
+                    'rgb(194,24,91,0.2)',
+                    'rgba(123,31,162,0.2)',
+                    'rgb(81,45,168,0.2)',
+                    'rgb(48,63,159,0.2)',
+                    'rgb(25,118,210,0.2)',
+                    'rgb(2,136,209,0.2)',
+                    'rgb(0,151,167,0.2)',
+                    'rgb(0,121,107,0.2)',
+                    'rgb(56,142,60,0.2)',
+                    'rgb(104,159,56,0.2)',
+                    'rgb(175,180,43,0.2)',
+                    'rgb(251,192,45,0.2)',
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    'rgb(211,47,47)',
+                    'rgb(194,24,91)',
+                    'rgba(123,31,162)',
+                    'rgb(81,45,168)',
+                    'rgb(48,63,159)',
+                    'rgb(25,118,210)',
+                    'rgb(2,136,209)',
+                    'rgb(0,151,167)',
+                    'rgb(0,121,107)',
+                    'rgb(56,142,60)',
+                    'rgb(104,159,56)',
+                    'rgb(175,180,43)',
+                    'rgb(251,192,45)',
                 ],
                 borderWidth: 1
             }]
