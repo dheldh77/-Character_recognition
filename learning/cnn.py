@@ -1,170 +1,45 @@
 import numpy as np
 import tensorflow as tf
 from imageResizing import LoadData
-from tensorflow.python.framework import ops
+import datetime
 
-def reset_graph(seed = 42):
-<<<<<<< HEAD
-    tf.compat.v1.reset_default_graph()
-    tf.compat.v1.set_random_seed(seed)
-=======
-    # tf.reset_default_graph()
-    ops.reset_default_graph()
-    # tf.set_random_seed(seed)
-    tf.random.set_seed()
->>>>>>> 1b4cab01857cab4605bf34fa2d06984b5cc5aa46
-    np.random.seed(seed)
-
-height = 28
-width = 28
-channels = 1
-n_inputs = height * width
-
-conv1_fmaps = 32
-conv1_ksize = 3
-conv1_stride = 1
-conv1_pad = "SAME"
-
-conv2_fmaps = 64
-conv2_ksize = 3
-conv2_stride = 1
-conv2_pad = "SAME"
-conv2_dropout_rate = 0.25
-
-pool3_fmaps = conv2_fmaps
-
-n_fc1 = 128
-fc1_dropout_rate = 0.5
-
-n_outputs = 2
-
-reset_graph()
-
-with tf.name_scope("inputs"):
-    X = tf.compat.v1.placeholder(tf.float32, shape=[None, n_inputs], name="X")
-    X_reshaped = tf.reshape(X, shape=[-1, height, width, channels])
-    tf.compat.v1.summary.image('input', X_reshaped, 10)
-    y = tf.compat.v1.placeholder(tf.int32, shape=[None], name="y")
-    training = tf.compat.v1.placeholder_with_default(False, shape=[], name='training')
-
-<<<<<<< HEAD
-with tf.name_scope("conv1"):
-    conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
-                         strides=conv1_stride, padding=conv1_pad,
-                         activation=tf.nn.relu, name="conv1")
-
-
-=======
-conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
-                        strides=conv1_stride, padding=conv1_pad,
-                        activation=tf.nn.relu, name="conv1")
->>>>>>> 1b4cab01857cab4605bf34fa2d06984b5cc5aa46
-conv2 = tf.layers.conv2d(conv1, filters=conv2_fmaps, kernel_size=conv2_ksize,
-                        strides=conv2_stride, padding=conv2_pad,
-                        activation=tf.nn.relu, name="conv2")
-
-with tf.name_scope("pool3"):
-    pool3 = tf.nn.max_pool2d(conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
-    pool3_flat = tf.reshape(pool3, shape=[-1, pool3_fmaps * 14 * 14])
-    pool3_flat_drop = tf.layers.dropout(pool3_flat, conv2_dropout_rate, training=training)
-
-with tf.name_scope("fc1"):
-    fc1 = tf.layers.dense(pool3_flat_drop, n_fc1, activation=tf.nn.relu, name="fc1")
-    fc1_drop = tf.layers.dropout(fc1, fc1_dropout_rate, training=training)
-
-with tf.name_scope("output"):
-    logits = tf.layers.dense(fc1, n_outputs, name="output")
-    Y_proba = tf.nn.softmax(logits, name="Y_proba")
-
-with tf.name_scope("train"):
-    print(logits.get_shape())
-    print(y.get_shape())
-    xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=y)
-    loss = tf.reduce_mean(xentropy)
-    optimizer = tf.train.AdamOptimizer()
-    training_op = optimizer.minimize(loss)
-
-with tf.name_scope("eval"):
-    correct = tf.nn.in_top_k(logits, y, 1)
-    accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
-
-with tf.name_scope("init_and_save"):
-    init = tf.global_variables_initializer()
-    saver = tf.train.Saver()
-
-def get_model_params():
-    gvars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    return {gvar.op.name: value for gvar, value in zip(gvars, tf.get_default_session().run(gvars))}
-
-def restore_model_params(model_params):
-    gvar_names = list(model_params.keys())
-    assign_ops = {gvar_name: tf.get_default_graph().get_operation_by_name(gvar_name + "/Assign")
-                for gvar_name in gvar_names}
-    init_values = {gvar_name: assign_op.inputs[1] for gvar_name, assign_op in assign_ops.items()}
-    feed_dict = {init_values[gvar_name]: model_params[gvar_name] for gvar_name in gvar_names}
-    tf.get_default_session().run(assign_ops, feed_dict=feed_dict)
-
-
-(X_train, y_train), (X_test, y_test) = LoadData(9)
-print('Data loaded')
-X_train = X_train.astype(np.float32).reshape(-1, 28 * 28)
-X_test = X_test.astype(np.float32).reshape(-1, 28 * 28)
-y_train = y_train.astype(np.int32)
-y_test = y_test.astype(np.int32)
-X_valid, X_train = X_train[:20], X_train[20:]
-y_valid, y_train = y_train[:20], y_train[20:]
-
-def shuffle_batch(X, y, batch_size):
-    rnd_idx = np.random.permutation(len(X))
-    n_batches = len(X) // batch_size
-    for batch_idx in np.array_split(rnd_idx, n_batches):
-        X_batch, y_batch = X[batch_idx], y[batch_idx]
-        yield X_batch, y_batch
-
-
-n_epochs = 150
 batch_size = 5
 
-best_loss_val = np.infty
-check_interval = 500
-checks_since_last_progress = 0
-max_checks_without_progress = 20
-best_model_params = None
+dropout_rate = 0.25
 
-for var in tf.trainable_variables():
-    tf.summary.histogram(var.name, var)
-merged = tf.compat.v1.summary.merge_all()
-writer = tf.compat.v1.summary.FileWriter('./train')
+model = tf.keras.Sequential()
+model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(tf.keras.layers.MaxPool2D((2, 2)))
+model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(tf.keras.layers.MaxPool2D((2, 2)))
+model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(tf.keras.layers.Flatten())
+model.add(tf.keras.layers.Dense(128, activation='relu'))
+model.add(tf.keras.layers.Dropout(dropout_rate))
+model.add(tf.keras.layers.Dense(256, activation='relu'))
+model.add(tf.keras.layers.Dropout(dropout_rate))
+model.add(tf.keras.layers.Dense(2, activation='softmax'))
 
+model.summary()
 
-with tf.Session() as sess:
-    init.run()
-    tf.compat.v1.global_variables_initializer().run()
-    for epoch in range(n_epochs):
-        n_batches = len(X_train) // batch_size
-        for iteration in range(n_batches):
-            X_batch, y_batch = next(shuffle_batch(X_train, y_train, batch_size))
-            summary, _ = sess.run([merged, training_op], feed_dict={X: X_batch, y: y_batch, training: True})
-            if iteration % check_interval == 0:
-                loss_val = loss.eval(feed_dict={X: X_valid, y: y_valid})
-                if loss_val < best_loss_val:
-                    best_loss_val = loss_val
-                    checks_since_last_progress = 0
-                    best_model_params = get_model_params()
-                else:
-                    checks_since_last_progress += 1
-            writer.add_summary(summary, iteration)
-        acc_batch = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
-        acc_val = accuracy.eval(feed_dict={X: X_valid, y: y_valid})
-        print("에포크 {}, 배치 데이터 정확도: {:.4f}%, 검증 세트 정확도: {:.4f}%, 검증 세트에서 최선의 손실: {:.6f}".format(
-                  epoch, acc_batch * 100, acc_val * 100, best_loss_val))
-        if checks_since_last_progress > max_checks_without_progress:
-            print("조기 종료!")
-            break
-    writer.close()
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-    if best_model_params:
-        restore_model_params(best_model_params)
-    acc_test = accuracy.eval(feed_dict={X: X_test, y: y_test})
-    print("테스트 세트에서 최종 정확도:", acc_test)
-    save_path = saver.save(sess, "./my_model")
+(X_train, y_train), (X_test, y_test) = LoadData(1)
+print(np.shape(X_train))
+print(len(X_train))
+X_train = X_train.astype(np.float32).reshape(len(X_train), 28, 28, 1)
+X_test = X_test.astype(np.float32).reshape(len(X_test), 28, 28, 1)
+y_train = y_train.astype(np.int32)
+y_test = y_test.astype(np.int32)
+X_valid, X_train = X_train[:40], X_train[40:]
+y_valid, y_train = y_train[:40], y_train[40:]
+
+es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+
+log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tb = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, callbacks=[es, tb])
+_, train_acc = model.evaluate(X_train, y_train, verbose=0)
+_, test_acc = model.evaluate(X_test, y_test, verbose=0)
+print('Train: %.3f, Test: %.3f' % (train_acc, test_acc))
