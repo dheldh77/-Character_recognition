@@ -166,16 +166,12 @@ with tf.Session() as sess:
             writer.add_summary(summary, iteration)
         acc_batch = accuracy.eval(feed_dict={X: X_batch, y: y_batch, dropout_rate: 1.0})
         acc_val = accuracy.eval(feed_dict={X: X_valid, y: y_valid, dropout_rate: 1.0})
-        print("에포크 {}, 배치 데이터 정확도: {:.4f}%, 검증 세트 정확도: {:.4f}%, 검증 세트에서 최선의 손실: {:.6f}".format(
-                  epoch, acc_batch * 100, acc_val * 100, best_loss_val))
         if checks_since_last_progress > max_checks_without_progress:
-            print("조기 종료!")
             break
     writer.close()
 
     if best_model_params:
         restore_model_params(best_model_params)
     acc_test = accuracy.eval(feed_dict={X: X_test, y: y_test, dropout_rate: 1.0})
-    print("테스트 세트에서 최종 정확도:", acc_test)
     save_path = saver.save(sess, "./my_model")
     writer = tf.summary.FileWriter('./mygraph', sess.graph)

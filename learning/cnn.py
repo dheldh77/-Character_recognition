@@ -4,15 +4,10 @@ from imageResizing import LoadData
 from tensorflow.python.framework import ops
 
 def reset_graph(seed = 42):
-<<<<<<< HEAD
-    tf.compat.v1.reset_default_graph()
-    tf.compat.v1.set_random_seed(seed)
-=======
     # tf.reset_default_graph()
     ops.reset_default_graph()
     # tf.set_random_seed(seed)
     tf.random.set_seed()
->>>>>>> 1b4cab01857cab4605bf34fa2d06984b5cc5aa46
     np.random.seed(seed)
 
 height = 28
@@ -47,18 +42,9 @@ with tf.name_scope("inputs"):
     y = tf.compat.v1.placeholder(tf.int32, shape=[None], name="y")
     training = tf.compat.v1.placeholder_with_default(False, shape=[], name='training')
 
-<<<<<<< HEAD
-with tf.name_scope("conv1"):
-    conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
-                         strides=conv1_stride, padding=conv1_pad,
-                         activation=tf.nn.relu, name="conv1")
-
-
-=======
 conv1 = tf.layers.conv2d(X_reshaped, filters=conv1_fmaps, kernel_size=conv1_ksize,
                         strides=conv1_stride, padding=conv1_pad,
                         activation=tf.nn.relu, name="conv1")
->>>>>>> 1b4cab01857cab4605bf34fa2d06984b5cc5aa46
 conv2 = tf.layers.conv2d(conv1, filters=conv2_fmaps, kernel_size=conv2_ksize,
                         strides=conv2_stride, padding=conv2_pad,
                         activation=tf.nn.relu, name="conv2")

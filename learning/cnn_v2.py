@@ -3,10 +3,13 @@ import tensorflow as tf
 from imageResizing import LoadData
 import layer_define as ld
 
+tf.compat.v1.disable_eager_execution()
+
 def reset_graph(seed = 42):
     tf.compat.v1.reset_default_graph()
     tf.compat.v1.set_random_seed(seed)
     np.random.seed(seed)
+    
 
 height = 28
 width = 28
@@ -21,7 +24,7 @@ with tf.name_scope("inputs"):
     X_reshaped = tf.reshape(X, shape=[-1, height, width, channels])
     tf.compat.v1.summary.image('input', X_reshaped, 10)
     y = tf.compat.v1.placeholder(tf.int32, shape=[None], name="y")
-    dropout_rate = tf.placeholder(tf.float32)
+    dropout_rate = tf.compat.v1.placeholder(tf.float32)
 
 #(28X28X1)
 conv1 = ld.conv(X_reshaped, channel_size=channels, layer_size=32)
@@ -115,8 +118,7 @@ with tf.Session() as sess:
             writer.add_summary(summary, iteration)
         acc_batch = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
         acc_val = accuracy.eval(feed_dict={X: X_valid, y: y_valid})
-        print("에포크 {}, 배치 데이터 정확도: {:.4f}%, 검증 세트 정확도: {:.4f}%, 검증 세트에서 최선의 손실: {:.6f}".format(
-                  epoch, acc_batch * 100, acc_val * 100, best_loss_val))
+        # print("에포크 {}, 배치 데이터 정확도: {:.4f}%, 검증 세트 정확도: {:.4f}%, 검증 세트에서 최선의 손실: {:.6f}".format(epoch, acc_batch * 100, acc_val * 100, best_loss_val))
         if checks_since_last_progress > max_checks_without_progress:
             print("조기 종료!")
             break
