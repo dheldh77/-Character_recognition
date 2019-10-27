@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
 from .data_learning import learning_about_data, check_CDR
 from django.utils import timezone
+from .cnn import image_learning
 
 # 메인화면
 def home(request):
@@ -194,6 +195,7 @@ def analysis(request):
 
 # 이미지 학습
 def image_analysis(request):
+    image_learning()
     return redirect('home')
 
 

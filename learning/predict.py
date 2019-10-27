@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import cv2
-from imageResizing import ImageTunning
+from imageResizing import ImageTuning
 
 def reset_graph(seed = 42):
     tf.reset_default_graph()
