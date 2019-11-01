@@ -39,6 +39,32 @@ def select(request):
 
 
 
+def simple_test(request):
+    if request.method == 'POST':
+        for i in range(1, 5):
+            img = Photo()
+            file_name = 'file' + str(i)
+            check_name = 'check' + str(i)
+            img.image = request.FILES[file_name]
+            img.check = request.POST[check_name]
+            img.grade = True
+            img.save()
+            return redirect('home')
+
+    dic = {}
+    for i in range(1, 5):
+        file_name = 'file'+str(i)
+        check_name = 'check'+str(i)
+        dic[i] = check_name
+    return render(request, 'simple_test.html', {'dic':dic})
+
+
+
+def simple_result(request):
+    return redner(request, 'simple_result.html')
+
+
+
 # 채점화면
 def scoring(request):
     avg = MRIAvg.objects.last()

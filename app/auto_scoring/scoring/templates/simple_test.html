@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<section class="scoring">
+    <div class="con" id="con_change">
+        <form enctype='multipart/form-data' method="POST" id="mainform">
+            {% csrf_token %}
+            <div style="margin-top: 150px; margin-bottom: 150px; text-align: center;" id="second">
+                <a onclick="cust('0')" class="waves-effect waves-light btn">테스트 시작</a>
+            </div>
+            {% for key, value in dic.items %}
+            <!-- 답안지 체출 -->
+            <div class="none" id="{{key}}">
+                <div style="text-align: center;">
+                    <div class="title">
+                        <h3>{{key}}번 문제</h3>
+                    </div>
+                    <div class="preview_patient_image">
+                        <img src="" id="preview-{{value}}" height="400px" />
+                    </div>
+                </div>
+                
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" name="file{{key}}" id="{{value}}">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <i class="material-icons prefix">assignment_turned_in</i>
+                        <input id="icon_prefix" type="number" name="{{value}}" class="validate">
+                        <label for="icon_prefix">answer</label>
+                    </div>
+                </div>
+                <div class="submit">
+                    <a onclick="cust('{{key}}')" class="waves-effect waves-light btn">Next</a>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- 채점 -->
+            <div style="display: flex; justify-content: center;">
+                <div id="submit_id" class="view_score">
+                    <input type="submit" class="btn btn-dark" value="submit">
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<script>
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                imgId = '#preview-'+$(input).attr('id');
+                $(imgId).attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("form#mainform input[type='file']").change(function(){
+        readURL(this);
+        });
+</script>
+<script>
+    function cust(arg){
+        if(arg == '0'){
+            $('#second').css('display','none');
+            $('#1').css('display','unset');
+            $('#con_change').css('width', '500px');
+        }
+        else if(arg == '4'){
+            $('#4').css('display','none');
+            $('#submit_id').css('display','unset');
+        }
+        else{
+            temp = '#' + arg;
+            next = '#' + String(Number(arg) + 1);
+            $(temp).css('display','none');
+            $(next).css('display','unset');
+        }
+    }
+</script>
+{% endblock content %}

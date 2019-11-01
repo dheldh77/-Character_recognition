@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', scoring.views.home, name='home'),
     path('list/', scoring.views.list, name='list'),
+    path('scoring/simple_test', scoring.views.simple_test, name='simple_test'),
+    path('scoring/simple_result', scoring.views.simple_result, name='simple_result'),
     path('scoring/scoring', scoring.views.scoring, name='scoring'),
     path('scoring/analysis', scoring.views.analysis, name='analysis'),
     path('scoring/select', scoring.views.select, name='select'),
