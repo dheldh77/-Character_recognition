@@ -26,6 +26,7 @@ class ScoreList(models.Model):
     educ = models.IntegerField(null=True) # 교육 기간
     MR_delay = models.IntegerField(null=True) # 딜레이
     hand = models.IntegerField(null=True) # 손잡이
+    test = models.BooleanField(null=True) # 테스트
 
     def __str__(self):
         return self.name

@@ -20,7 +20,7 @@ def home(request):
 
 # 검사자 리스트 화면
 def list(request):
-    subjects = ScoreList.objects.all().order_by('-id')
+    subjects = ScoreList.objects.all().order_by('-id').filter(test=None)
     # 페이지네이션
     paginator = Paginator(subjects, 10)
     try:
@@ -41,27 +41,34 @@ def select(request):
 
 def simple_test(request):
     if request.method == 'POST':
+        list = ScoreList()
+        list.name = 'test'
+        list.test = True
+        list.save()
         for i in range(1, 5):
             img = Photo()
+            img.scorelist = list
             file_name = 'file' + str(i)
             check_name = 'check' + str(i)
             img.image = request.FILES[file_name]
             img.check = request.POST[check_name]
             img.grade = True
+            print(img.image)
             img.save()
-            return redirect('home')
-
-    dic = {}
-    for i in range(1, 5):
-        file_name = 'file'+str(i)
-        check_name = 'check'+str(i)
-        dic[i] = check_name
+        return redirect('/scoring/simple_result/' + str(list.id))
+    else:
+        dic = {}
+        for i in range(1, 5):
+            file_name = 'file'+str(i)
+            check_name = 'check'+str(i)
+            dic[i] = check_name
     return render(request, 'simple_test.html', {'dic':dic})
 
 
 
-def simple_result(request):
-    return redner(request, 'simple_result.html')
+def simple_result(request, list_id):
+    list = get_object_or_404(ScoreList, pk=list_id)
+    return render(request, 'simple_result.html', {'list' : list})
 
 
 
@@ -160,7 +167,7 @@ def result(request, list_id):
 
 # 데이터 분석 결과 화면
 def analysis(request):
-    subjects = ScoreList.objects.all().order_by('-id')
+    subjects = ScoreList.objects.all().order_by('-id').filter(test=None)
     total_age = {50:0, 60:0, 70:0, 80:0, 90 : 0}
     total_age_cnt = {50:0, 60:0, 70:0, 80:0, 90 : 0}
     total_age_avg = {50:0, 60:0, 70:0, 80:0, 90 : 0}
@@ -229,7 +236,7 @@ def image_analysis(request):
 # 데이터 학습
 def data_analysis(request):
     # db에 저장된 환자 정보를 모드 긁어옴
-    subjects = ScoreList.objects.all().order_by('-id')
+    subjects = ScoreList.objects.all().order_by('-id').filter(test=None)
     list_subjects = []
 
     for subject in subjects:
