@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, PageNotAnInteger
 from .create_csv import MakeCSV
 from .data_learning import learning_about_data, check_CDR
 from django.utils import timezone
+from .cnn import image_learning
 
 # 메인화면
 def home(request):
@@ -35,6 +36,32 @@ def list(request):
 # 선택화면
 def select(request):
     return render(request, 'select.html')
+
+
+
+def simple_test(request):
+    if request.method == 'POST':
+        for i in range(1, 5):
+            img = Photo()
+            file_name = 'file' + str(i)
+            check_name = 'check' + str(i)
+            img.image = request.FILES[file_name]
+            img.check = request.POST[check_name]
+            img.grade = True
+            img.save()
+            return redirect('home')
+
+    dic = {}
+    for i in range(1, 5):
+        file_name = 'file'+str(i)
+        check_name = 'check'+str(i)
+        dic[i] = check_name
+    return render(request, 'simple_test.html', {'dic':dic})
+
+
+
+def simple_result(request):
+    return redner(request, 'simple_result.html')
 
 
 
@@ -194,6 +221,7 @@ def analysis(request):
 
 # 이미지 학습
 def image_analysis(request):
+    image_learning()
     return redirect('home')
 
 
