@@ -75,66 +75,69 @@ def PostProcessingWithoutLabel(path):
     return img
 
 
-def PostProcessingWithLabel(path, PN):
+def PostProcessingWithLabel(path, PN, number):
     """
     해당 path의 이미지를 라벨과 함께 전처리 합니다.
     :param path: 구체적인 데이터 경로 ex)./data/train/positive/1/1.png
     :param PN: 1(POSITIVE)-positive, 0(NEGATIVE)-negative
     :return: input, label(28X28크기를 가진 numpy.array type의 0~1사이 값을 가진 전처리 이미지와 1크기를가진 numpy.array type의 0또는 1의 값을 가진 라벨)
+    lagel data: P(000000000) N(000000000)
     """
     if (PN == POSITIVE):
-        return PostProcessingWithoutLabel(path), np.array(1)
+        return PostProcessingWithoutLabel(path), number - 1
     elif (PN == NEGATIVE):
-        return PostProcessingWithoutLabel(path), np.array(0)
+        return PostProcessingWithoutLabel(path), number + 9 - 1
     else:
         exit()
 
 
-def GetDataWithPP(dir, number):
+def GetDataWithPP(dir):     # Get data with post processing
     p_path = dir + 'positive/'
     n_path = dir + 'negative/'
     input_data = []
     label_data = []
 
-    path = p_path + str(number) + '/'
-    img_list = os.listdir(path)
+    for idx in range(1, 10):
 
-    for img in img_list:
-        img_path = os.path.join(path, img)
-        input, label = PostProcessingWithLabel(img_path, POSITIVE)
-        input_data.append(input)
-        label_data.append(label)
+        path = p_path + str(idx) + '/'
+        img_list = os.listdir(path)
 
-    path = n_path + str(number) + '/'
-    img_list = os.listdir(path)
+        for img in img_list:
+            img_path = os.path.join(path, img)
+            input, label = PostProcessingWithLabel(img_path, POSITIVE, idx)
+            input_data.append(input)
+            label_data.append(label)
 
-    for img in img_list:
-        img_path = os.path.join(path, img)
-        input, label = PostProcessingWithLabel(img_path, NEGATIVE)
-        input_data.append(input)
-        label_data.append(label)
+        path = n_path + str(idx) + '/'
+        img_list = os.listdir(path)
+
+        for img in img_list:
+            img_path = os.path.join(path, img)
+            input, label = PostProcessingWithLabel(img_path, NEGATIVE, idx)
+            input_data.append(input)
+            label_data.append(label)
 
     return np.array(input_data), np.array(label_data)
 
 
 def SaveData():
     for i in range(1, 10):
-        input, label = GetDataWithPP(TRAIN_DIR, i)
-        path = "./post_data/train/" + str(i)
-        np.savez(path, x = input, y = label)
-        input, label = GetDataWithPP(TEST_DIR, i)
-        path = "./post_data/test/" + str(i)
-        np.savez(path, x = input, y = label)
+        input, label = GetDataWithPP(TRAIN_DIR)
+        path = "./post_data/train"
+        np.savez(path, x=input, y=label)
+        input, label = GetDataWithPP(TEST_DIR)
+        path = "./post_data/test"
+        np.savez(path, x=input, y=label)
 
 
-def LoadData(number):
-    path = "./post_data/train/" + str(number) + ".npz"
+def LoadData():
+    path = "./post_data/train.npz"
     if not os.path.isfile(path):
         SaveData()
     train = np.load(path)
     train_input = train['x']
     train_label = train['y']
-    path = "./post_data/test/" + str(number) + ".npz"
+    path = "./post_data/test.npz"
     if not os.path.isfile(path):
         SaveData()
     test = np.load(path)
@@ -144,17 +147,22 @@ def LoadData(number):
 
 
 def LoadTrainDataWithPP(number):
-    return GetDataWithPP(TRAIN_DIR, number)
+    return GetDataWithPP(TRAIN_DIR)
 
 
 def LoadTestDataWithPP(number):
-    return GetDataWithPP(TEST_DIR, number)
+    return GetDataWithPP(TEST_DIR)
 
 
-def LoadDataWithPP(number):
-    """
-    해당 number의 train, test 데이터를 불러옵니다.
-    :param number: 가져올 데이터의 번호
-    :return: (train_input, train_label), (test_input, test_label)
-    """
-    return (LoadTrainDataWithPP(number)), (LoadTestDataWithPP(number))
+# def LoadDataWithPP(number):
+#     """
+#     해당 number의 train, test 데이터를 불러옵니다.
+#     :param number: 가져올 데이터의 번호
+#     :return: (train_input, train_label), (test_input, test_label)
+#     """
+#     return (LoadTrainDataWithPP(number)), (LoadTestDataWithPP(number))
+
+SaveData()
+(x, y), (x_, y_) = LoadData()
+
+print(x.shape, y.shape)
