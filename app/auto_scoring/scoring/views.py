@@ -48,6 +48,7 @@ def simple_test(request):
         for i in range(1, 5):
             img = Photo()
             img.scorelist = list
+
             file_name = 'file' + str(i)
             check_name = 'check' + str(i)
             img.image = request.FILES[file_name]
@@ -62,6 +63,7 @@ def simple_test(request):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
+
     return render(request, 'simple_test.html', {'dic':dic})
 
 
@@ -69,6 +71,7 @@ def simple_test(request):
 def simple_result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'simple_result.html', {'list' : list})
+
 
 
 
