@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+<<<<<<< HEAD
 import sys
 from imageResizing import PostProcessingWithoutLabel
 
@@ -30,4 +31,8 @@ class Predict:
 #     sys.exit()
 #
 # def predict_model(number, data):
+=======
+import cv2
+from imageResizing import ImageTuning
+>>>>>>> c085514faa5f2ad6cf5f73f8340279cbbbee886a
 
