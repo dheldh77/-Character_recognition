@@ -35,7 +35,6 @@ def ImageTuning(image):
     ret, thresh = cv2.threshold(imgray, 127, 255, cv2.THRESH_BINARY)
 
     contours, hierachy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    print(len(contours))
 
     x, y, w, h = cv2.boundingRect(contours[0])
     X = x + w
@@ -107,6 +106,7 @@ def GetDataWithPP(dir):     # Get data with post processing
             input, label = PostProcessingWithLabel(img_path, POSITIVE, idx)
             input_data.append(input)
             label_data.append(label)
+        print(str(idx) + ' P: done')
 
         path = n_path + str(idx) + '/'
         img_list = os.listdir(path)
@@ -116,18 +116,18 @@ def GetDataWithPP(dir):     # Get data with post processing
             input, label = PostProcessingWithLabel(img_path, NEGATIVE, idx)
             input_data.append(input)
             label_data.append(label)
+        print(str(idx) + ' N: done')
 
     return np.array(input_data), np.array(label_data)
 
 
 def SaveData():
-    for i in range(1, 10):
-        input, label = GetDataWithPP(TRAIN_DIR)
-        path = "./post_data/train"
-        np.savez(path, x=input, y=label)
-        input, label = GetDataWithPP(TEST_DIR)
-        path = "./post_data/test"
-        np.savez(path, x=input, y=label)
+    input, label = GetDataWithPP(TRAIN_DIR)
+    path = "./post_data/train"
+    np.savez(path, x=input, y=label)
+    input, label = GetDataWithPP(TEST_DIR)
+    path = "./post_data/test"
+    np.savez(path, x=input, y=label)
 
 
 def LoadData():
@@ -161,8 +161,3 @@ def LoadTestDataWithPP(number):
 #     :return: (train_input, train_label), (test_input, test_label)
 #     """
 #     return (LoadTrainDataWithPP(number)), (LoadTestDataWithPP(number))
-
-SaveData()
-(x, y), (x_, y_) = LoadData()
-
-print(x.shape, y.shape)

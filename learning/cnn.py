@@ -5,7 +5,7 @@ from imageResizing import LoadData
 import datetime
 
 MODEL_PATH = './model'
-if ~os.path.isdir(MODEL_PATH):
+if not os.path.isdir(MODEL_PATH):
     os.mkdir(MODEL_PATH)
 MODEL_NAME = '3C3D_model.h5'
 MODEL_PATH = os.path.join(MODEL_PATH, MODEL_NAME)
@@ -29,7 +29,7 @@ model.add(tf.keras.layers.Dense(18, activation='softmax'))
 
 model.summary()
 
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 (X_train, y_train), (X_test, y_test) = LoadData()
 print(np.shape(X_train))
@@ -38,10 +38,11 @@ X_train = X_train.astype(np.float32).reshape(len(X_train), 28, 28, 1)
 X_test = X_test.astype(np.float32).reshape(len(X_test), 28, 28, 1)
 y_train = tf.keras.utils.to_categorical(y_train)
 y_test = tf.keras.utils.to_categorical(y_test)
+print(np.shape(y_train))
 # y_train = y_train.astype(np.int32)
 # y_test = y_test.astype(np.int32)
-X_valid, X_train = X_train[:40], X_train[40:]
-y_valid, y_train = y_train[:40], y_train[40:]
+#X_valid, X_train = X_train[:40], X_train[40:]
+#y_valid, y_train = y_train[:40], y_train[40:]
 
 es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
@@ -52,9 +53,16 @@ with file_writer.as_default():
     tf.summary.image("Training data", X_train, step=0, max_outputs=len(X_train))
     tf.summary.image("Test data", X_test, step=0, max_outputs=len(X_test))
 
-history = model.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=100, callbacks=[es, tb])
+history = model.fit(X_train, y_train, epochs=50, callbacks=[ tb])
+#validation_data=(X_valid, y_valid)
 
 model.save(MODEL_PATH)
 train_loss, train_acc = model.evaluate(X_train, y_train, verbose=0)
 test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
+with file_writer.as_default():
+    tf.summary.scalar("train_loss", train_loss, step=0)
+    tf.summary.scalar("train_acc", train_acc, step=0)
+    tf.summary.scalar("test_loss", test_loss, step=0)
+    tf.summary.scalar("test_acc", test_acc, step=0)
+
 print('Train: %.5f, Test: %.5f, Train loss: %.5f, Test loss: %.5f' % (train_acc, test_acc, train_loss, test_loss))
