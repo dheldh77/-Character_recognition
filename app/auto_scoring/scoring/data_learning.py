@@ -20,6 +20,7 @@ def learning_about_data():
     data = pd.read_csv('./scoring/train.csv',encoding='euc-kr')
     # 필요없는 속성 제거
     data.drop(["name", "Unnamed: 0"],axis=1, inplace = True)
+    print(data);
     # CDR을 one-hot encoding 해줌
     # data = pd.get_dummies(data, columns=['CDR'], prefix='CDR')
 
@@ -48,7 +49,6 @@ def learning_about_data():
     # 머신러닝
     model = LinearRegression()
     model.fit(x_data, y)
-    print(x_data)
 
     # 저장
     joblib.dump(model, 'data_model.pkl')

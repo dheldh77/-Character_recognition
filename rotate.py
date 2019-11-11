@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-img = cv2.imread('./data/train/positive/1/1.png', -1)
+img = cv2.imread('./learning/data/train/positive/1/1.png', -1)
 h2,w2=img.shape[:2]
 matrix=cv2.getRotationMatrix2D((w2/2,h2/2),10,1)
 img2=cv2.warpAffine(img,matrix,(w2,h2))

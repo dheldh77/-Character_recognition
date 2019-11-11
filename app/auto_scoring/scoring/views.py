@@ -48,7 +48,6 @@ def simple_test(request):
         for i in range(1, 5):
             img = Photo()
             img.scorelist = list
-
             file_name = 'file' + str(i)
             check_name = 'check' + str(i)
             img.image = request.FILES[file_name]
@@ -63,7 +62,6 @@ def simple_test(request):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
-
     return render(request, 'simple_test.html', {'dic':dic})
 
 
@@ -71,7 +69,6 @@ def simple_test(request):
 def simple_result(request, list_id):
     list = get_object_or_404(ScoreList, pk=list_id)
     return render(request, 'simple_result.html', {'list' : list})
-
 
 
 
@@ -220,10 +217,6 @@ def analysis(request):
         if total_educ_cnt[key] == 0:
             continue
         total_educ_avg[key] = total_educ[key] / total_educ_cnt[key]
-    
-    print(total_gender_avg)
-    print(total_SES_avg)
-    print(total_educ_avg)
 
     return render(request, 'analysis.html',{'total_educ_avg':total_educ_avg, 'total_SES_avg':total_SES_avg, 'total_age_avg':total_age_avg, 'total_gender_avg':total_gender_avg})
 
@@ -280,4 +273,10 @@ def data_analysis(request):
     mriavg.avgSES = avg['SES']
     mriavg.analysis_date = timezone.now()
     mriavg.save()
+    print("평균 두개골과 두뇌사이 공간(ASF) : " , mriavg.avgASF)
+    print("평균 뇌용량 정규화(nWBV)  : " , mriavg.avgnWBV)
+    print("평균 내척추수액(eTIV) : " , mriavg.avgeTIV)
+    print("평균 간이 정신 상태(MMSE) : " , mriavg.avgMMSE)
+    print("평균 사회 지위(SES) : " , mriavg.avgSES)
+    print("평균 딜레이 시간(MRI Delay) : " , mriavg.avgASF)
     return redirect('analysis')
