@@ -42,9 +42,9 @@
                         <tr>
                             <td><img src="{{pic.image.url}}" width="300"></td>
                             {% if pic.grade == True %}
-                            <td>통과</td>
+                            <td><span style="color:#1e88e5;">통과</span></td>
                             {% else %}
-                            <td>탈락</td>
+                            <td><span style="color:#ff1744;">탈락</span></td>
                             {% endif %}
                         </tr>
                         {% endfor %}

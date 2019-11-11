@@ -46,9 +46,9 @@ def simple_test(request):
         list.name = 'test'
         list.test = True
         list.save()
-        total = 4
+        total = 5
         cnt = 0
-        for i in range(1, 5):
+        for i in range(1, 6):
             img = Photo()
             img.scorelist = list
             file_name = 'file' + str(i)
@@ -75,7 +75,7 @@ def simple_test(request):
         return redirect('/scoring/simple_result/' + str(list.id))
     else:
         dic = {}
-        for i in range(1, 5):
+        for i in range(1, 6):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
@@ -92,6 +92,8 @@ def simple_result(request, list_id):
 # 채점화면
 def scoring(request):
     avg = MRIAvg.objects.last()
+    total = 5
+    cnt = 0
     if request.method == 'POST':
         check_CDR_object = {}
         form = ScoreListForm(request.POST)
@@ -147,28 +149,36 @@ def scoring(request):
             list.save()
 
             # 이미지 저장
-            for i in range(1, 5):
+            for i in range(1, 6):
                 img = Photo()
                 img.scorelist = list
                 file_name = 'file' + str(i)
                 check_name = 'check' + str(i)
                 img.image = request.FILES[file_name]
                 img.check = request.POST[check_name]
-                img.grade = True
-                # print(Predict_object(img.image.path))
+                # print(img.image.path)
+                # print(settings.MEDIA_ROOT + img.image.name)
+                img.grade = False
                 img.save()
-            # for afile in request.FILES.getlist('file'):
-            #     img = Photo()
-            #     img.scorelist = list
-            #     img.image = afile
-            #     img.save()
-            #     image_resizing(img.image.path,img.image.name)
+                ans = int(Predict_object(img.image.path))
+                img_com = get_object_or_404(Photo, pk=img.id)
+                if(img_com.check == ans + 1):
+                    img_com.grade = True
+                    cnt += 1
+                img_com.save()
+            list_com = get_object_or_404(ScoreList, pk=list.id)
+            list.score = cnt/total * 100
+            if(list.score >= 60):
+                list.pass_or_fail = True
+            else:
+                list.pass_or_fail = False
+            list.save()
 
             return redirect('/scoring/result/' + str(list.id))
     else:
         form = ScoreListForm()
         dic = {}
-        for i in range(1, 5):
+        for i in range(1, 6):
             file_name = 'file'+str(i)
             check_name = 'check'+str(i)
             dic[i] = check_name
