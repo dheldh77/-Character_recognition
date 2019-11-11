@@ -14,7 +14,7 @@ class ScoreList(models.Model):
     weight = models.FloatField(null=True) # 몸무게
     past_diagnostic_record = models.IntegerField(null=True) # 과거력
     pub_date = models.DateTimeField(null=True) # 진달일
-    score = models.IntegerField(null=True) # 점수
+    score = models.FloatField(null=True) # 점수
     pass_or_fail = models.BooleanField(null=True) # 치매여부
     
     ASF = models.FloatField(null=True) # 두개골과 두뇌사이 공간

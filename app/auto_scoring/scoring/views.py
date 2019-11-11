@@ -46,6 +46,8 @@ def simple_test(request):
         list.name = 'test'
         list.test = True
         list.save()
+        total = 4
+        cnt = 0
         for i in range(1, 5):
             img = Photo()
             img.scorelist = list
@@ -61,7 +63,15 @@ def simple_test(request):
             img_com = get_object_or_404(Photo, pk=img.id)
             if(img_com.check == ans + 1):
                 img_com.grade = True
+                cnt += 1
             img_com.save()
+        list_com = get_object_or_404(ScoreList, pk=list.id)
+        list.score = cnt/total * 100
+        if(list.score >= 60):
+            list.pass_or_fail = True
+        else:
+            list.pass_or_fail = False
+        list.save()
         return redirect('/scoring/simple_result/' + str(list.id))
     else:
         dic = {}
