@@ -41,7 +41,11 @@
                         {% for pic in list.photo_set.all %}
                         <tr>
                             <td><img src="{{pic.image.url}}" width="300"></td>
+                            {% if pic.grade == True %}
                             <td>통과</td>
+                            {% else %}
+                            <td>탈락</td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>

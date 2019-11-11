@@ -11,6 +11,7 @@ from .create_csv import MakeCSV
 from .data_learning import learning_about_data, check_CDR
 from django.utils import timezone
 from .cnn import image_learning
+from .predict import Predict_object
 
 # 메인화면
 def home(request):
@@ -52,9 +53,15 @@ def simple_test(request):
             check_name = 'check' + str(i)
             img.image = request.FILES[file_name]
             img.check = request.POST[check_name]
-            img.grade = True
-            print(img.image)
+            # print(img.image.path)
+            # print(settings.MEDIA_ROOT + img.image.name)
+            img.grade = False
             img.save()
+            ans = int(Predict_object(img.image.path))
+            img_com = get_object_or_404(Photo, pk=img.id)
+            if(img_com.check == ans + 1):
+                img_com.grade = True
+            img_com.save()
         return redirect('/scoring/simple_result/' + str(list.id))
     else:
         dic = {}
@@ -138,6 +145,7 @@ def scoring(request):
                 img.image = request.FILES[file_name]
                 img.check = request.POST[check_name]
                 img.grade = True
+                # print(Predict_object(img.image.path))
                 img.save()
             # for afile in request.FILES.getlist('file'):
             #     img = Photo()

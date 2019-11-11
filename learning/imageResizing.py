@@ -70,6 +70,7 @@ def PostProcessingWithoutLabel(path):
     :return: input(numpy.array type의 28X28크기의 0~1사이 값을 가진 전처리 이미지)
     """
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    print(img)
     img = ImageTuning(img)
     return img
 

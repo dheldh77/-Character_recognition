@@ -25,21 +25,21 @@ class Predict:
 
 
 predict = Predict()
-# predict.predict('./data/predict/001/01.png')
+predict.predict('/Users/kimminseok/Desktop/lecture/app/Character_recognition/app/auto_scoring/media/3.png')
 # predict.predict('./data/predict/001/02.png')
 # predict.predict('./data/predict/001/03.png')
-while(1):
-    print('-------------------------------------------------------------\n')
-    print("<<<<<<<<<<<< 예측할 이미지의 path 입력 : >>>>>>>>>>>>>>>")
-    file_path = input();
-    if(file_path == 'stop'):
-        break;
-    ans = predict.predict(file_path)
-    if(ans >= 0 and ans <= 8):
-        print('입력한 이미지의 정답은 ', ans+1, '번 입니다')
-    else:
-        print('입력한 이미지는 ', ans-8, '번에 가까운 오답입니다. ')
-    print('\n-------------------------------------------------------------\n')
+# while(1):
+#     print('-------------------------------------------------------------\n')
+#     print("<<<<<<<<<<<< 예측할 이미지의 path 입력 : >>>>>>>>>>>>>>>")
+#     file_path = input();
+#     if(file_path == 'stop'):
+#         break;
+#     ans = predict.predict(file_path)
+#     if(ans >= 0 and ans <= 8):
+#         print('입력한 이미지의 정답은 ', ans+1, '번 입니다')
+#     else:
+#         print('입력한 이미지는 ', ans-8, '번에 가까운 오답입니다. ')
+#     print('\n-------------------------------------------------------------\n')
 
 # MODEL_PATH = './model'
 # predict_number = 8
