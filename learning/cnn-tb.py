@@ -32,29 +32,23 @@ model.summary()
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 (X_train, y_train), (X_test, y_test) = LoadData()
-print(np.shape(X_train))
-print(len(X_train))
 X_train = X_train.astype(np.float32).reshape(len(X_train), 28, 28, 1)
 X_test = X_test.astype(np.float32).reshape(len(X_test), 28, 28, 1)
 y_train = tf.keras.utils.to_categorical(y_train)
 y_test = tf.keras.utils.to_categorical(y_test)
-print(np.shape(y_train))
-# y_train = y_train.astype(np.int32)
-# y_test = y_test.astype(np.int32)
-#X_valid, X_train = X_train[:40], X_train[40:]
-#y_valid, y_train = y_train[:40], y_train[40:]
+X_valid, X_train = X_train[:200], X_train[200:]
+y_valid, y_train = y_train[:200], y_train[200:]
 
-es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20)
 
-log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tb = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1, embeddings_freq=1)
 file_writer = tf.summary.create_file_writer(log_dir)
 with file_writer.as_default():
     tf.summary.image("Training data", X_train, step=0, max_outputs=len(X_train))
     tf.summary.image("Test data", X_test, step=0, max_outputs=len(X_test))
 
-history = model.fit(X_train, y_train, epochs=50, callbacks=[ tb])
-#validation_data=(X_valid, y_valid)
+history = model.fit(X_train, y_train, epochs=500, callbacks=[es, tb], validation_data=(X_valid, y_valid))
 
 model.save(MODEL_PATH)
 train_loss, train_acc = model.evaluate(X_train, y_train, verbose=0)
@@ -66,3 +60,5 @@ with file_writer.as_default():
     tf.summary.scalar("test_acc", test_acc, step=0)
 
 print('Train: %.5f, Test: %.5f, Train loss: %.5f, Test loss: %.5f' % (train_acc, test_acc, train_loss, test_loss))
+
+

@@ -122,11 +122,31 @@ def GetDataWithPP(dir):     # Get data with post processing
     return np.array(input_data), np.array(label_data)
 
 
-def SaveData():
+# def SaveData():
+#     input, label = GetDataWithPP(TRAIN_DIR)
+#     path = "./post_data/train"
+#     np.savez(path, x=input, y=label)
+#     input, label = GetDataWithPP(TEST_DIR)
+#     path = "./post_data/test"
+#     np.savez(path, x=input, y=label)
+
+
+def SaveData():     #shuffle version
     input, label = GetDataWithPP(TRAIN_DIR)
+    sh = np.arange(input.shape[0])
+    np.random.shuffle(sh)
+    input = input[sh]
+    label = label[sh]
+    print(input[0:10])
     path = "./post_data/train"
     np.savez(path, x=input, y=label)
+
     input, label = GetDataWithPP(TEST_DIR)
+    sh = np.arange(input.shape[0])
+    np.random.shuffle(sh)
+    input = input[sh]
+    label = label[sh]
+    print(input[0:10])
     path = "./post_data/test"
     np.savez(path, x=input, y=label)
 

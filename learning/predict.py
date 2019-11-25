@@ -1,7 +1,6 @@
 import os
 import tensorflow as tf
 import numpy as np
-import sys
 from imageResizing import PostProcessingWithoutLabel
 
 
@@ -24,20 +23,11 @@ class Predict:
         return predict_number
 
 
+"""
+usage
 predict = Predict()
 predict.predict('./data/predict/001/01.png')
-predict.predict('./data/predict/001/02.png')
-predict.predict('./data/predict/001/03.png')
+"""
 
-# MODEL_PATH = './model'
-# predict_number = 8
-# MODEL_NAME = '3C3D_model_' + str(predict_number) + '.h5'
-# MODEL_PATH = os.path.join(MODEL_PATH, MODEL_NAME)
-#
-# try:
-#     model = tf.keras.models.load_model(MODEL_PATH)
-# except FileNotFoundError:
-#     print(MODEL_PATH + ': File not found')
-#     sys.exit()
-#
-# def predict_model(number, data):
+
+
